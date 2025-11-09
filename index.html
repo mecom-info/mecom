@@ -1780,7 +1780,6 @@
   })(); // end bracket IIFE
 
 </script>
-<!-- Добавь этот код перед закрывающим тегом </body> -->
 
 <style>
 .secret-pixel {
@@ -1827,170 +1826,106 @@
     animation: pixelPop 0.6s forwards;
 }
 
-/* Стили для красивого алерта */
+/* Стили для красивого алерта - ИСПРАВЛЕНЫ ДЛЯ ТЕЛЕФОНА */
 .secret-mission-alert {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: linear-gradient(135deg, #0b1220, #1a237e);
+    background: rgba(11, 18, 32, 0.98);
     color: white;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-    z-index: 10001;
-    max-width: 500px;
-    width: 90%;
-    border: 2px solid #FF1493;
-    text-align: center;
-    font-family: 'Poppins', sans-serif;
-}
-
-.secret-mission-alert h3 {
-    color: #FF1493;
-    margin-bottom: 20px;
-    font-size: 22px;
-}
-
-.secret-mission-alert p {
-    margin: 15px 0;
-    line-height: 1.6;
-    font-size: 15px;
-}
-
-.secret-mission-alert ol {
-    text-align: left;
-    margin: 20px 0;
-    padding-left: 20px;
-}
-
-.secret-mission-alert li {
-    margin: 12px 0;
-    line-height: 1.5;
-}
-
-.secret-mission-alert .highlight {
-    background: rgba(255, 20, 147, 0.2);
-    padding: 10px;
-    border-radius: 8px;
-    border-left: 3px solid #FF1493;
-    margin: 15px 0;
-    font-weight: 600;
-}
-
-.secret-mission-alert .emoji {
-    font-size: 24px;
-    margin-bottom: 10px;
-}
-
-.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.8);
-    z-index: 10000;
-}
-</style>
-
-<!-- Добавь этот код перед закрывающим тегом </body> -->
-
-<style>
-.secret-pixel {
-    position: fixed;
-    width: 1px;
-    height: 1px;
-    background: #000;
-    cursor: pointer;
-    z-index: 10000;
-    transition: all 0.3s ease;
-    pointer-events: auto;
-}
-
-.secret-pixel:hover {
-    transform: scale(8);
-    background: #FF1493;
-    box-shadow: 0 0 20px rgba(255, 20, 147, 0.5);
-}
-
-.pixel-tooltip {
-    position: absolute;
-    font-size: 8px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-    white-space: nowrap;
-    background: rgba(0,0,0,0.8);
-    color: white;
-    padding: 2px 6px;
-    border-radius: 3px;
-}
-
-.secret-pixel:hover .pixel-tooltip {
-    opacity: 1;
-}
-
-@keyframes pixelPop {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(12); opacity: 0.5; }
-    100% { transform: scale(25); opacity: 0; }
-}
-
-.pixel-pop {
-    animation: pixelPop 0.6s forwards;
-}
-
-/* Стили для красивого алерта */
-.secret-mission-alert {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(11, 18, 32, 0.95);
-    color: white;
-    padding: 30px;
+    padding: 20px;
     border-radius: 15px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.7);
     z-index: 10002;
-    max-width: 500px;
+    max-width: 90%;
     width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
     border: 2px solid #FF1493;
     text-align: center;
     font-family: 'Poppins', sans-serif;
     backdrop-filter: blur(10px);
 }
 
+/* Обводка для лучшей видимости на телефоне */
+.secret-mission-alert::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 18px;
+    pointer-events: none;
+    z-index: -1;
+}
+
 .secret-mission-alert h3 {
     color: #FF1493;
-    margin-bottom: 20px;
-    font-size: 22px;
+    margin-bottom: 15px;
+    font-size: 18px;
+    line-height: 1.3;
 }
 
 .secret-mission-alert p {
-    margin: 15px 0;
-    line-height: 1.6;
-    font-size: 15px;
+    margin: 12px 0;
+    line-height: 1.5;
+    font-size: 14px;
 }
 
 .secret-mission-alert ol {
     text-align: left;
-    margin: 20px 0;
+    margin: 15px 0;
     padding-left: 20px;
 }
 
 .secret-mission-alert li {
-    margin: 12px 0;
-    line-height: 1.5;
+    margin: 10px 0;
+    line-height: 1.4;
+    font-size: 14px;
 }
 
 .secret-mission-alert .highlight {
     background: rgba(255, 20, 147, 0.2);
-    padding: 10px;
+    padding: 12px;
     border-radius: 8px;
     border-left: 3px solid #FF1493;
     margin: 15px 0;
     font-weight: 600;
+    font-size: 14px;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 20, 147, 0.3);
+    position: relative;
+}
+
+/* Индикатор копирования */
+.secret-mission-alert .highlight::after {
+    content: '📋';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.secret-mission-alert .highlight:hover::after {
+    content: '✅';
+    opacity: 1;
+}
+
+.secret-mission-alert .highlight.copied::after {
+    content: '✅ Скопировано!';
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
 }
 
 .secret-mission-alert .emoji {
@@ -2022,7 +1957,7 @@
 
 .mekom-text {
     position: absolute;
-    font-size: 120px;
+    font-size: 80px;
     font-weight: 900;
     color: rgba(255, 255, 255, 0.3);
     white-space: nowrap;
@@ -2030,7 +1965,7 @@
     transform: rotate(-45deg);
     font-family: 'Poppins', sans-serif;
     text-transform: uppercase;
-    letter-spacing: 20px;
+    letter-spacing: 15px;
 }
 
 .mekom-text:nth-child(1) { top: -100px; left: -200px; animation-delay: 0s; }
@@ -2053,13 +1988,14 @@
     background: linear-gradient(90deg, #0088cc, #00a2ff);
     color: white !important;
     text-decoration: none;
-    padding: 8px 16px;
+    padding: 10px 18px;
     border-radius: 20px;
     margin: 10px 0;
     font-weight: 600;
     transition: all 0.3s ease;
     border: 2px solid transparent;
     box-shadow: 0 4px 15px rgba(0, 136, 204, 0.3);
+    font-size: 14px;
 }
 
 .telegram-link:hover {
@@ -2075,6 +2011,76 @@
 .telegram-link::after {
     content: " 🔗";
     font-size: 14px;
+}
+
+/* Супер маленький текст с информацией о плюшке */
+.prize-note {
+    font-size: 10px !important;
+    color: #888 !important;
+    text-align: center;
+    margin-top: 8px;
+    line-height: 1.3;
+    font-style: italic;
+}
+
+/* Кнопка закрытия */
+.close-button {
+    background: linear-gradient(90deg, #FF1493, #FF69B4);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 15px;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    width: 100%;
+    max-width: 200px;
+}
+
+.close-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 20, 147, 0.4);
+}
+
+/* Адаптивность для очень маленьких экранов */
+@media (max-width: 480px) {
+    .secret-mission-alert {
+        padding: 15px;
+        max-height: 90vh;
+    }
+    
+    .secret-mission-alert h3 {
+        font-size: 16px;
+    }
+    
+    .secret-mission-alert p,
+    .secret-mission-alert li {
+        font-size: 13px;
+    }
+    
+    .secret-mission-alert .highlight {
+        font-size: 13px;
+        padding: 10px;
+    }
+    
+    .mekom-text {
+        font-size: 60px;
+        letter-spacing: 10px;
+    }
+    
+    .prize-note {
+        font-size: 9px !important;
+    }
+}
+
+/* Для очень высоких экранов */
+@media (min-height: 800px) {
+    .secret-mission-alert {
+        max-height: 80vh;
+    }
 }
 </style>
 
@@ -2149,6 +2155,9 @@ function createSecretPixel() {
         
         overlay.appendChild(mekomBackground);
         
+        // Текст для копирования с эмодзи
+        const copyText = "«Я заметил(а) тот самый странный сбой! Мои 25к баллов готовы?» 🕵️‍♀️";
+        
         // Создаем красивое сообщение
         const alertBox = document.createElement('div');
         alertBox.className = 'secret-mission-alert';
@@ -2164,30 +2173,50 @@ function createSecretPixel() {
                 <li>Перейдите по сверхсекретной ссылке:<br>
                     <a href="https://t.me/mekom_chat" target="_blank" class="telegram-link">https://t.me/mekom_chat</a>
                 </li>
-                <li>Сообщите в чат кодовую фразу:</li>
+                <li>Сообщите в чат кодовую фразу (нажмите чтобы скопировать):</li>
             </ol>
             
-            <div class="highlight">«Я заметил(а) тот самый странный сбой! Мои 25к баллов готовы?»</div>
+            <div class="highlight" id="copyText">${copyText}</div>
             
-            <p>Мы срочно проверим ваши полномочия и зачислим приз. Вы — первый, кто сумел разгадать нашу маленькую хитрость!</p>
+            <div class="prize-note">
+                «Данная плюшка будет выдана самому первому пользователю отправившему данное сообщение в чат!»
+            </div>
             
-            <button onclick="closeSecretMission()" style="
-                background: linear-gradient(90deg, #FF1493, #FF69B4);
-                color: white;
-                border: none;
-                padding: 12px 30px;
-                border-radius: 25px;
-                font-weight: 600;
-                cursor: pointer;
-                margin-top: 15px;
-                font-family: 'Poppins', sans-serif;
-                transition: all 0.3s ease;
-            ">Понятно! 🎯</button>
+            <button class="close-button">Понятно! 🎯</button>
         `;
         
         // Добавляем на страницу
         document.body.appendChild(overlay);
         document.body.appendChild(alertBox);
+        
+        // Функция для копирования текста
+        const copyElement = document.getElementById('copyText');
+        copyElement.addEventListener('click', function() {
+            navigator.clipboard.writeText(copyText).then(() => {
+                // Показываем подтверждение копирования
+                this.classList.add('copied');
+                setTimeout(() => {
+                    this.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                // Fallback для старых браузеров
+                const textArea = document.createElement('textarea');
+                textArea.value = copyText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                this.classList.add('copied');
+                setTimeout(() => {
+                    this.classList.remove('copied');
+                }, 2000);
+            });
+        });
+        
+        // Обработчик закрытия
+        const closeButton = alertBox.querySelector('.close-button');
+        closeButton.addEventListener('click', closeSecretMission);
         
         // Анимация "взрыва" пикселя
         this.classList.add('pixel-pop');
@@ -2243,7 +2272,5 @@ document.addEventListener('click', function(e) {
 });
 </script>
 
-
 </body>
 </html>
-
