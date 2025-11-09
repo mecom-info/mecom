@@ -1,0 +1,2249 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Корпорация МЕКОМ — экономическая игра МЭКОМ</title>
+<meta name="description" content="МЭКОМ — экономические игры между классами (7–11). Правила, сетку, регистрация." />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  /*
+    Исправления:
+    1. Унифицированная плавная анимация появления всех секций
+    2. Единая цветовая палитра - все цвета берутся из :root
+    3. Убрана подпись в футере
+  */
+
+  :root{
+    --bg:#f7fbff;
+    --blue:#FF1493;
+    --blue-2:#FF69B4;
+    --soft:#ffa7dd;
+    --muted:#6b7280;
+    --card:#ffffff;
+    --glass: rgba(255,255,255,0.8);
+    --radius:14px;
+    --maxwidth:1200px;
+    --site-padding:18px;
+    --base-font-size:15px;
+    --ui-radius:12px;
+    
+    /* Призовые цвета теперь отсюда */
+    --prize-highlight-bg: linear-gradient(90deg,#fff5cc,#ffe680);
+    --prize-highlight-color: #533f00;
+    --prize-section-bg: linear-gradient(90deg,var(--blue),var(--blue-2));
+  }
+
+  /* Base sizing & reset */
+  html { font-size: var(--base-font-size); box-sizing: border-box; }
+  *,*::before,*::after{ box-sizing: inherit; }
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;
+    background: linear-gradient(180deg,var(--bg),#ffffff);
+    color:#0b1220;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    line-height:1.45;
+    -webkit-tap-highlight-color:transparent;
+  }
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;height:auto;display:block}
+  .wrap{max-width:var(--maxwidth);margin:0 auto;padding:var(--site-padding);box-sizing:border-box}
+
+  /* ---------- HERO ---------- */
+  header.hero{
+    position:relative;
+    overflow:hidden;
+    border-radius:18px;
+    padding:18px;
+    background:
+      radial-gradient(600px 120px at -10% 0%, rgba(37,98,255,0.06), transparent 6%),
+      linear-gradient(180deg, rgba(8,36,102,0.04), rgba(255,255,255,0.9));
+    box-shadow:0 8px 30px rgba(12,24,60,0.06);
+    min-height:110px;
+  }
+  /* Keep hero content above floaters */
+  .hero-row{display:flex;gap:12px;align-items:center;position:relative; z-index:2}
+  .logo{
+    width:72px;height:72px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--blue-2));
+    display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:20px;
+    flex-shrink:0;box-shadow:0 6px 18px rgba(41,82,255,0.16);
+    transform-origin:center; animation:logo-bob 3s ease-in-out infinite;
+  }
+  @keyframes logo-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  .hero h1{font-size:18px;margin:0;color:var(--blue);letter-spacing:-0.2px}
+  .hero .tag{margin-top:6px;color:var(--muted);font-size:13px}
+  .hero .ctas{display:flex;gap:10px;margin-top:10px}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;font-weight:700;font-size:14px;
+    cursor:pointer;border:0;box-shadow:0 8px 24px rgba(10,30,120,0.06);
+    align-self:flex-start;
+  }
+  .btn:focus{ outline: none; box-shadow: 0 0 0 4px rgba(0,91,255,0.10); }
+  .btn-primary{background:linear-gradient(90deg,var(--blue),var(--blue-2));color:white; animation:btn-glow 2.4s infinite;}
+  @keyframes btn-glow{0%{box-shadow:0 8px 20px rgba(0,91,255,0.14)}50%{box-shadow:0 14px 30px rgba(0,91,255,0.22)}100%{box-shadow:0 8px 20px rgba(0,91,255,0.14)}}
+  .btn-ghost{background:#fff;border:1px solid rgba(10,40,120,0.06);color:var(--muted)}
+
+  /* ---------- FLOATERS (behind content) ---------- */
+  .floaters{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:0; /* strictly behind hero content */
+    transition:opacity .28s ease, transform .28s ease;
+  }
+  .floaters.hidden { opacity:0; transform: translateY(6px); pointer-events:none; }
+  .riff {
+    position:absolute;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(180deg,var(--soft),#e6f3ff);color:var(--blue);opacity:0.95;box-shadow:0 6px 18px rgba(10,30,100,0.08);
+    transform-origin:center;
+    will-change:transform;
+    pointer-events:none;
+  }
+  .riff.small{width:34px;height:34px}
+  @keyframes riff-float {0%{transform:translateY(0) rotate(0)}50%{transform:translateY(-12px) rotate(8deg)}100%{transform:translateY(0) rotate(0)}}
+
+  /* ---------- SECTIONS ---------- */
+  section{
+    margin-top:18px;
+    padding:16px;
+    border-radius:14px;
+    background:var(--card);
+    box-shadow:0 8px 26px rgba(12,24,56,0.04);
+    /* Единая анимация появления */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  section.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  h2{margin:0 0 8px 0;font-size:16px;color:var(--blue)}
+  p.muted{color:var(--muted);font-size:13px;margin:0}
+  .cols{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:720px){ .cols{grid-template-columns:1fr 360px} }
+
+  /* ---------- HOW TO PLAY (cards) ---------- */
+  .steps{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  @media(max-width:480px){ .steps{grid-template-columns:1fr} }
+  .card{
+    background:linear-gradient(180deg,#fff,#fbfdff);
+    padding:12px;border-radius:12px;border:1px solid rgba(10,40,120,0.04);
+    display:flex;gap:10px;align-items:flex-start;transition:transform .28s ease, box-shadow .28s ease;
+  }
+  .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(30,60,140,0.08)}
+  .icon{
+    width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--soft));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;
+    box-shadow:0 10px 24px rgba(10,60,200,0.08);flex-shrink:0;
+  }
+  .card h3{margin:0;font-size:15px;color:#0b234d}
+  .card p{margin:6px 0 0 0;color:var(--muted);font-size:13px}
+
+  /* nested list in step 3 */
+  .strategy{margin-top:8px;padding-left:12px}
+  .strategy li{margin:6px 0;color:var(--muted);font-size:13px;line-height:1.4}
+
+  /* ---------- PRIZES TABLE ---------- */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  thead td{background:linear-gradient(90deg,var(--blue),var(--blue-2));color:white;padding:10px;border-radius:8px 8px 0 0;font-weight:700}
+  tbody td{padding:12px;border-bottom:1px dashed rgba(10,30,80,0.04)}
+  .amount{font-weight:800;text-align:right;color:var(--blue-2);font-variant-numeric:tabular-nums}
+
+  /* ---------- PRIZES SECTION ---------- */
+  .prizes-section{
+    background: var(--prize-section-bg); /* Теперь из переменной */
+    color: #fff;
+    border-radius:12px;
+    padding:12px;
+    box-shadow:0 12px 34px rgba(10,30,80,0.08);
+    margin-top:12px;
+  }
+  .prizes-section .section-title{
+    font-weight:800;
+    margin:6px 0 10px 0;
+    font-size:15px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    animation:prizesFadeIn 520ms cubic-bezier(.2,.9,.2,1);
+  }
+  .prizes-table{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .prize-row{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.06);font-weight:700;animation:prizeRowIn 420ms ease}
+  .prize-row.highlight{
+    background: var(--prize-highlight-bg); /* Теперь из переменной */
+    color: var(--prize-highlight-color); /* Теперь из переменной */
+    box-shadow:0 10px 30px rgba(255,193,7,0.06)
+  }
+  @keyframes prizesFadeIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:none} }
+  @keyframes prizeRowIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+
+  /* ---------- WHY MEKOM ---------- */
+  .why{display:flex;gap:12px;align-items:center}
+  .why .text{flex:1}
+  .badge{background:linear-gradient(90deg,var(--soft),#cfeaff);padding:8px 10px;border-radius:10px;color:var(--blue);font-weight:700}
+
+  /* ---------- FORM ---------- */
+  form input, form select, form textarea{width:100%;padding:10px;margin-top:8px;border-radius:10px;border:1px solid rgba(10,30,80,0.06);font-size:14px}
+  .submit{margin-top:10px;width:100%}
+  .small{font-size:13px;color:var(--muted)}
+
+  /* make t.me links clearly clickable */
+  a[href^="https://t.me"]{color:var(--blue);font-weight:700;text-decoration:none}
+  a[href^="https://t.me"]:hover{ text-decoration:underline }
+
+  /* ---------- FOOTER ---------- */
+  /* Убрана подпись - оставляем только отступ */
+  footer{margin-top:14px;padding:14px;opacity:0} /* Скрываем но сохраняем отступ */
+
+  /* ---------- Animations ---------- */
+  /* Убраны старые fade-in стили, теперь используется единый подход в section */
+  .typing{display:inline-block;white-space:nowrap;overflow:hidden;border-right:2px solid rgba(0,0,0,0.12)}
+  @keyframes pulse-blue{0%{transform:scale(1)}50%{transform:scale(1.03)}100%{transform:scale(1)}}
+  .pulse{animation:pulse-blue 2400ms infinite}
+
+  /* small helpers */
+  .flex{display:flex;gap:8px;align-items:center}
+  .muted-2{color:#4b5563;font-size:13px}
+
+  /* =========================
+     РИФ (styling) - добавлено из кода 1
+     ========================= */
+  .rif-section { 
+    padding: 14px; 
+    border-radius:12px; 
+    background: linear-gradient(180deg,#fff,#fbfdff); 
+    border:1px solid rgba(10,40,120,0.04); 
+    box-shadow:0 8px 26px rgba(12,24,56,0.04); 
+  }
+  .rif-grid { display:grid; grid-template-columns: 1fr; gap:12px; align-items:stretch; }
+  @media(min-width:720px){ .rif-grid { grid-template-columns: 1fr 320px; } }
+
+  .rif-left { display:flex; flex-direction:column; gap:12px; }
+  .rif-intro { font-size:14px; color:var(--muted); }
+  .rif-cards { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+  @media(max-width:560px){ .rif-cards { grid-template-columns:1fr; } }
+
+  /* circular factor card */
+  .rif-factor {
+    background:linear-gradient(180deg,#fff,#f7fbff);
+    border-radius:12px;
+    padding:10px;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    border:1px solid rgba(10,40,120,0.04);
+    cursor: pointer;
+  }
+  /* УБРАНА обводка при нажатии на диаграммы */
+  .rif-factor:focus { outline: none; }
+  .rif-factor .svg-wrap { width:64px; height:64px; flex:0 0 64px; position:relative; }
+  .rif-factor svg { display:block; width:64px; height:64px; }
+  .rif-factor .label { font-weight:800; font-size:13px; color:#0b234d; }
+  .rif-factor .desc { font-size:12px; color:var(--muted); margin-top:4px; }
+
+  /* progress bar alternative for the right column */
+  .rif-right { display:flex; flex-direction:column; gap:12px; align-items:stretch; }
+  .rif-total {
+    display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:linear-gradient(90deg,#fff,#f0f8ff);border:1px solid rgba(10,40,120,0.04);
+  }
+  .rif-total .total-value { font-weight:900; font-size:28px; color:var(--blue); }
+  .rif-total .total-label { color:var(--muted); font-size:13px; }
+
+  .rif-bars { display:flex; flex-direction:column; gap:10px; }
+  .rif-bar {
+    background:rgba(8,36,102,0.03);
+    border-radius:10px;
+    padding:10px;
+    display:flex;flex-direction:column;gap:6px;
+  }
+  .rif-bar .row { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .rif-bar .bar-track { height:10px; background:rgba(0,0,0,0.06); border-radius:999px; overflow:hidden; }
+  .rif-bar .bar-fill { height:100%; width:0%; border-radius:999px; background: linear-gradient(90deg,var(--blue),var(--blue-2)); transition:width .9s cubic-bezier(.2,.9,.2,1); }
+
+  .rif-note { font-size:12px; color:var(--muted); }
+
+  /* accordion (Интересный факт) */
+  .accordion { margin-top:10px; border-radius:10px; overflow:hidden; border:1px solid rgba(10,40,120,0.04); background:linear-gradient(180deg,#fff,#fbfdff); }
+  .accordion .trigger { 
+    display:flex; 
+    justify-content:space-between; 
+    align-items:center; 
+    width:100%; 
+    padding:12px; 
+    background:transparent; 
+    border:0; 
+    cursor:pointer; 
+    font-weight:800; 
+    color:var(--muted);
+    border: 1px solid rgba(10,40,120,0.06);
+  }
+  .accordion .content { padding:0 12px; max-height:0; overflow:hidden; transition: max-height 320ms cubic-bezier(.2,.9,.2,1), opacity 220ms ease; opacity:0; }
+  .accordion.open .content { opacity:1; padding:12px; }
+  .accordion .content p { margin:0; color:var(--muted); font-size:13px; line-height:1.45; }
+
+  /* ИЗМЕНЕНИЕ 1: Цвет текста "Интересный факт" в синий при открытии */
+  .accordion.open .trigger { color:var(--blue); }
+
+  /* Новый стиль для подписи под диаграммой РИФ */
+  .rif-record-label {
+    font-size: 11px;
+    color: var(--blue);
+    font-weight: 600;
+    text-align: center;
+    margin-top: 4px;
+    line-height: 1.2;
+  }
+
+  /* ===========================================================
+     MECOM BRACKET — улучшенная версия стилей
+     =========================================================== */
+  .mecom-bracket{
+    --me-blue:var(--blue);
+    --me-blue-2:var(--blue-2);
+    --me-soft:var(--soft);
+    background: linear-gradient(90deg,rgba(7,48,159,0.03),rgba(0,91,255,0.02));
+    border-radius:12px;
+    padding:10px;
+    box-sizing:border-box;
+    color:#0b1220;
+    font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  }
+  .mecom-rounds-nav{display:flex;gap:6px;position:sticky;top:8px;z-index:5;margin-bottom:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .mecom-rounds-nav::-webkit-scrollbar{display:none;}
+  .mecom-rounds-nav .mecom-chip{background:rgba(0,91,255,0.06);color:var(--me-blue);padding:8px 10px;border-radius:999px;font-weight:700;cursor:pointer;border:0;font-size:12px;white-space:nowrap;}
+  .mecom-rounds-nav .mecom-chip.is-active{background:linear-gradient(90deg,var(--me-blue),var(--me-blue-2));color:#fff;}
+
+  .mecom-swiper{position:relative;overflow:hidden;border-radius:10px;background:linear-gradient(180deg,#fff,#f7fbff);border:1px solid rgba(10,30,80,0.04);transition:height .26s ease;}
+  .mecom-swiper-track{display:flex;width:100%;will-change:transform;transform:translate3d(0,0,0);transition:transform .26s ease;touch-action:pan-y;align-items:flex-start;}
+  .mecom-slide{
+    min-width:100%;
+    padding:10px;
+    align-self:flex-start;
+    display:flex;
+    flex-direction:column;
+    /* Единая анимация для слайдов */
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.5s ease;
+  }
+  .mecom-slide.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .mecom-round-title{font-weight:800;margin-bottom:8px;color:#0b234d;display:flex;justify-content:space-between;align-items:center}
+
+  .pack{border-radius:12px;padding:10px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid rgba(10,40,120,0.04);margin-bottom:12px}
+  .pack-title{font-weight:800;color:#0b234d;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .pack-contents{display:flex;flex-direction:column;gap:8px}
+  .mecom-team{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:10px;background:rgba(0,0,0,0.03);transition:transform .18s ease, box-shadow .18s ease}
+  /* УБРАНА анимация при наведении на команды */
+  /* .mecom-team:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(10,30,80,0.06)} */
+  .mecom-team .left{display:flex;flex-direction:column;gap:6px;min-width:95px}
+  .mecom-team .name-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+  .mecom-team .team-name{font-weight:800;font-size:15px;color:#0b234d;white-space:nowrap}
+  .mecom-team.empty-slot{opacity:0.6;font-style:italic;color:var(--muted);padding:6px 12px;height:28px;display:flex;align-items:center;justify-content:flex-end;}
+  .mecom-team.placeholder{background:transparent;border:1px dashed rgba(0,0,0,0.03)}
+
+  .mecom-tag{font-size:11px;font-weight:800;padding:4px 6px;border-radius:999px;line-height:1;display:inline-block}
+  .mecom-tag-grade{background:rgba(0,0,0,0.06);color:#111}
+  .mecom-tag-north{background:rgba(0,92,255,0.09);color:#003cff}
+  .mecom-tag-south{background:rgba(255,59,59,0.10);color:#ff1f06}
+  .mecom-tag-east{background:rgba(255,160,60,0.10);color:#ff5100}
+  .mecom-tag-west{background:rgba(88,165,90,0.10);color:#35ff35}
+
+  .mecom-team.winner{background:linear-gradient(90deg,var(--me-soft),#dff4ff);box-shadow:0 10px 30px rgba(0,110,255,0.06)}
+  .mecom-team.winner .team-name{color:var(--blue)}
+  .mecom-team.winner .team-name::after{content:" 🏅";margin-left:8px}
+
+  .mecom-team.champion{background: linear-gradient(90deg,#fff5cc,#ffe680);color:#533f00;border:1px solid rgba(255,193,7,0.12);box-shadow:0 12px 30px rgba(255,193,7,0.08)}
+  .mecom-team.champion .team-name{ color:#533f00 }
+  .mecom-team.champion .team-name::after{ content: " 👑"; margin-left:8px; }
+
+  .promoted-note{font-size:12px;color:var(--muted);margin-top:6px}
+
+  .mecom-dots{display:flex;justify-content:center;gap:6px;padding:10px 0 2px 0}
+  .mecom-dot{width:8px;height:8px;border-radius:50%;background:rgba(0,0,0,0.15)}
+  .mecom-dot.is-active{background:var(--me-blue)}
+
+  @media(min-width:960px){ .mecom-swiper{ border-radius:12px } }
+  @media (max-width:560px){ .mecom-team .team-name{ font-size:14px } }
+
+  /* outline-chip (Ближайший чемпионат) */
+  .outline-chip {
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 12px;
+    border-radius:10px;
+    border:2px solid var(--blue);
+    background:transparent;
+    color:var(--blue);
+    font-weight:800;
+    font-size:13px;
+    cursor:pointer;
+    transition:all .22s ease;
+    box-shadow: 0 4px 12px rgba(6,30,80,0.04);
+  }
+  .outline-chip svg { width:18px; height:18px; flex:0 0 18px; display:block; }
+  .outline-chip:hover {
+    background: linear-gradient(90deg,var(--blue),var(--blue-2));
+    color:#fff;
+    transform:translateY(-3px);
+    box-shadow: 0 12px 30px rgba(37,98,255,0.12);
+  }
+  .outline-chip:focus { outline: none; box-shadow: 0 0 0 4px rgba(0,91,255,0.10); }
+
+  @media(max-width:540px){ .outline-chip{ width:100%; justify-content:center; } }
+
+  /* =========================
+     Responsive tweaks
+     ========================= */
+  @media (min-width:720px){
+    :root { --base-font-size:15.5px; }
+    .hero h1{ font-size:20px; }
+    .hero .tag{ font-size:14px; }
+    .wrap{ padding:20px; }
+    header.hero{ padding:22px; min-height:140px; }
+    .logo{ width:84px;height:84px;font-size:22px; border-radius:16px; }
+    .btn{ padding:12px 16px; font-size:15px; border-radius:14px; }
+  }
+
+  @media (min-width:960px){
+    :root { --base-font-size:16px; }
+    .wrap{ padding:28px; }
+    header.hero{ padding:28px 36px; min-height:160px; }
+    .hero h1{ font-size:22px; }
+    .hero .tag{ font-size:15px; }
+    .logo{ width:92px;height:92px;font-size:24px; }
+    .card{ padding:16px; }
+    .icon{ width:56px;height:56px; }
+    .steps{ grid-template-columns: repeat(3, 1fr); }
+    .cols{ grid-template-columns: 1fr 360px; }
+  }
+
+  @media (min-width:1280px){
+    :root { --base-font-size:17px; }
+    .wrap{ padding:32px; }
+    header.hero{ padding:34px 48px; min-height:200px; }
+    .hero h1{ font-size:24px; }
+    .hero .tag{ font-size:16px; }
+    .logo{ width:108px;height:108px;font-size:28px; border-radius:18px; }
+    .steps{ grid-template-columns: repeat(4, 1fr); gap:14px; }
+    .card p{ font-size:14px; }
+    .mecom-team .team-name{ font-size:16px; }
+  }
+
+  @media (min-width:1600px){
+    .wrap{ padding:40px; }
+    header.hero{ padding:44px 60px; min-height:240px; border-radius:20px; }
+    .hero h1{ font-size:28px; }
+    .hero .tag{ font-size:17px; }
+    .logo{ width:120px;height:120px;font-size:30px; }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .logo, .riff, .btn-primary, .rif-factor svg, .rif-factor .svg-wrap, .rif-bar .bar-fill { 
+      animation-duration: 1ms !important; 
+      animation-iteration-count: 1 !important; 
+      transition: none !important; 
+    }
+    section, .mecom-slide { 
+      transition: none !important; 
+      transform: none !important; 
+      opacity: 1 !important; 
+    }
+  }
+
+  /* very large screens keep content centered */
+  @media (min-width:1400px){
+    .wrap{ max-width:var(--maxwidth); margin-left: auto; margin-right: auto; }
+  }
+
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- HERO -->
+    <header class="hero" id="hero">
+      <div class="floaters" aria-hidden="true">
+        <!-- initial inline positions provided but may be overridden by JS for large screens -->
+        <div class="riff" id="riff-1" style="left:6%;top:10%" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" fill="white" opacity="0.06"/>
+            <path d="M6 12c2-5 10-5 10 0-2 5-10 5-10 0z" fill="#005BFF" opacity="0.18"/>
+          </svg>
+        </div>
+        <div class="riff small" id="riff-2" style="right:6%;top:22%" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12c2-5 10-5 10 0-2 5-10 5-10 0z" fill="#2b7bff"/></svg>
+        </div>
+        <div class="riff" id="riff-3" style="left:8%;bottom:10%" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c5 0 9 4 9 9s-4 9-9 9S3 17 3 12 7 3 12 3z" fill="#A7D8FF"/></svg>
+        </div>
+      </div>
+
+      <div class="hero-row">
+        <div class="logo" aria-hidden="true"><a href="https://www.youtube.com/watch?v=HIcSWuKMwOw" target="_blank" rel="noopener">МЕМ</a></div>
+        <div style="flex:1">
+          <h1 id="hero-title">МЭКОМ — экономика, азарт и риф</h1>
+          <div class="tag muted"> Корпорация МЕКОМ — экономические игры между старшими классами (с 7 по 11, Южного и Северного филиала) школы Взмах </div>
+          <div class="ctas">
+            <button class="btn btn-primary" onclick="scrollToId('how-play')" aria-label="Перейти к секции 'Как играть'">Как играть</button>
+            <button class="btn btn-ghost" onclick="scrollToId('reg')" aria-label="Перейти к секции 'Регистрация'">Регистрация</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ABOUT / WHAT IS MEKOM -->
+    <section id="about" aria-labelledby="aboutTitle">
+      <h2 id="aboutTitle">Что такое МЭКОМ?</h2>
+      <p class="muted">МЭКОМ — внутренняя школьная экономическая игра: команды из разных классов соревнуются в сериях раундов, принимают бизнес-решения и «зарабатывают» наивысший <strong>РИФ — <i>рейтинговый индекс фирмы</i></strong>. Чем лучше стратегия и командная игра, тем выше шанс пройти в финал.</p>
+      <div style="margin-top:12px" class="cols">
+        <div>
+          <div class="card" style="align-items:flex-start">
+            <div class="icon" aria-hidden="true">Р</div>
+            <div>
+              <h3>Для кого?</h3>
+              <p class="muted">Команды классов 7–11 из Южного и Северного филиалов. Каждый раунд — новая возможность показать смекалку.</p>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:10px">
+            <div class="icon" aria-hidden="true">⚖</div>
+            <div>
+              <h3>Цель</h3>
+              <p class="muted">Набирать наибольший риф в играх и пройти через турнирную сетку до финала — там решается всё.</p>
+            </div>
+          </div>
+        </div>
+
+        <aside class="bracket-info" style="padding:8px">
+          <button
+            type="button"
+            class="outline-chip"
+            aria-label="Ближайший чемпионат — Южный филиал. Перейти к турнирной сетке."
+            onclick="scrollToId('tournament')"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M7 10l5 5 5-5z"/>
+            </svg>
+            <span>Ближайший чемпионат — южный филиал</span>
+          </button>
+
+          <p class="muted" style="margin-top:8px">Следите за обновлениями в телеграме МЕКОМ (<a href="https://t.me/mekom_info" target="_blank" rel="noopener">@mekom_info</a>)</p>
+          <div style="margin-top:12px" class="small muted-2">Организаторы: Ян · Егор · Артемий</div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- TO WIN -->
+    <section id="how" aria-labelledby="howTitle">
+      <h2 id="howTitle">Как выиграть ВСЁ</h2>
+      <div class="steps" style="margin-top:12px">
+        <div class="card">
+          <div class="icon">👥</div>
+          <div>
+            <h3>1. Собери команду</h3>
+            <p class="muted">2–5 человек из класса, распределите роли: пусть хотя бы один игрок полностью изучит правила и формулы игры)</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="icon">📥</div>
+          <div>
+            <h3>2. Регистрация и старт</h3>
+            <p class="muted">Регистрируйтесь у организаторов или через форму — получите отчёт по фирме за нулевой период и разбор показателей.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="icon">⚙️</div>
+          <div>
+            <h3>3. Игра в раунде — стратегия важнее азарта</h3>
+            <p class="muted">В каждом раунде вы принимаете решения: докупать станки, вкладывать в рекламу, повышать качество продукции и т. п.</p>
+            <ul class="strategy">
+              <li><strong>Разберите свои показатели и придумайте стратегию.</strong></li>
+              <li><strong>Не бойтесь продуманных решений.</strong> Смелость + расчёт = преимущество.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="icon">🎯</div>
+          <div>
+            <h3>4. Прохождение стадий</h3>
+            <p class="muted">Отборочные → Вторая стадия → Полуфинал → Финал → Победитель.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW TO PLAY (decisions) -->
+    <section id="how-play" aria-labelledby="howPlayTitle">
+      <h2 id="howPlayTitle">Как играть — суть и решения</h2>
+      <p class="muted">В каждом периоде вы принимаете 5 ключевых решений, которые формируют результаты фирмы и влияют на РИФ.</p>
+
+      <div class="steps" style="margin-top:12px">
+        <div class="card small">
+          <div class="icon">1</div>
+          <div>
+            <h3>Установить цену</h3>
+            <p class="muted">Цена влияет на спрос, маржу и конкурентоспособность.</p>
+          </div>
+        </div>
+
+        <div class="card small">
+          <div class="icon">2</div>
+          <div>
+            <h3>Производство</h3>
+            <p class="muted">Определите количество товара и учитывайте загрузку фабрики.</p>
+          </div>
+        </div>
+
+        <div class="card small">
+          <div class="icon">3</div>
+          <div>
+            <h3>Маркетинг</h3>
+            <p class="muted">Вложения в рекламу повышают потенциал спроса.</p>
+          </div>
+        </div>
+
+        <div class="card small">
+          <div class="icon">4</div>
+          <div>
+            <h3>Инвестиции</h3>
+            <p class="muted">Амортизация и капвложения влияют на мощности и эффективность.</p>
+          </div>
+        </div>
+
+        <div class="card small">
+          <div class="icon">5</div>
+          <div>
+            <h3>НИОКР</h3>
+            <p class="muted">Повышают качество и долгосрочную конкурентоспособность.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- СЕКЦИЯ РИФ - добавлено из кода 1 -->
+    <section id="rif" class="rif-section" aria-labelledby="rif-title" style="margin-top:16px;">
+      <h2 id="rif-title">Что такое РИФ?</h2>
+      <div class="rif-grid" style="margin-top:10px;">
+        <!-- left: cards -->
+        <div class="rif-left">
+          <div class="rif-intro">
+            <strong>РИФ (Рейтинговый Индекс Фирмы)</strong> —  игровой показатель, отражающий эффективность фирмы в турнире. Он складывается из шести факторов. Ниже — краткие описания и визуализация каждого фактора (демонстрационные значения и максимумы показаны рядом).
+          </div>
+        <!-- right: totals -->
+        <div class="rif-right" aria-hidden="false">
+          <div class="rif-total" role="status" aria-live="polite">
+            <div style="flex:1">
+              <div class="total-label">Абсолютный рекорд РИФа!</div>
+              <div class="total-value" id="rifTotal">0</div>
+              <div class="rif-note">Накопленная прибыль + Потенциал спроса + Эффективность + Доля рынка + Рост</div>
+            </div>
+            <div style="width:120px; text-align:center;">
+              <!-- small donut for current game RIF -->
+              <svg viewBox="0 0 36 36" width="80" height="80" aria-hidden="true">
+                <path d="M18 2.0845
+                         a 15.9155 15.9155 0 0 1 0 31.831
+                         a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="3.2"></path>
+                <path class="total-ring" d="M18 2.0845
+                         a 15.9155 15.9155 0 0 1 0 31.831
+                         a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none" stroke="url(#tg)" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="100 100" stroke-dashoffset="100"></path>
+                <defs>
+                  <linearGradient id="tg" x1="0" x2="1"><stop offset="0" stop-color="var(--blue)"/><stop offset="1" stop-color="var(--blue-2)"/></linearGradient>
+                </defs>
+                <text x="18" y="21" font-size="8" text-anchor="middle" fill="#0b234d" font-weight="800" id="totalDonutText">0</text>
+              </svg>
+              <div class="rif-record-label">Наивысший показатель РИФа в последней игре!</div>
+            </div>
+          </div>
+
+          <div class="rif-cards" aria-hidden="false">
+            <!-- Factor: Накопленная прибыль (max 400 для вклада в РИФ) -->
+            <div class="rif-factor" data-factor="profit" role="group" aria-label="Накопленная прибыль">
+              <div class="svg-wrap" aria-hidden="true">
+                <svg viewBox="0 0 100 100" role="img" aria-hidden="true">
+                  <!-- base track -->
+                  <circle cx="50" cy="50" r="42" stroke="rgba(0,0,0,0.06)" stroke-width="12" fill="none"></circle>
+                  <!-- animated ring - ОРАНЖЕВЫЙ цвет -->
+                  <circle class="ring" cx="50" cy="50" r="42" stroke-width="12" stroke-linecap="round" stroke="url(#g1)" fill="none" stroke-dasharray="0" stroke-dashoffset="0"></circle>
+                  <defs>
+                    <linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#ff7b00"/><stop offset="1" stop-color="#ffa726"/></linearGradient>
+                  </defs>
+                  <text x="50" y="58" text-anchor="middle" font-size="20" font-weight="800" fill="#0b234d" class="ring-value">0</text>
+                </svg>
+              </div>
+              <div style="flex:1">
+                <div class="label">Накопленная прибыль</div>
+                <div class="desc">Главный компонент РИФ — вклад в итог до <strong>400</strong> пунктов.</div>
+              </div>
+            </div>
+
+            <!-- Потенциал спроса (max 20) -->
+            <div class="rif-factor" data-factor="demand" role="group" aria-label="Потенциал спроса">
+              <div class="svg-wrap" aria-hidden="true">
+                <svg viewBox="0 0 100 100" role="img" aria-hidden="true">
+                  <circle cx="50" cy="50" r="42" stroke="rgba(0,0,0,0.06)" stroke-width="12" fill="none"></circle>
+                  <circle class="ring" cx="50" cy="50" r="42" stroke-width="12" stroke-linecap="round" stroke="url(#g2)" fill="none" stroke-dasharray="0" stroke-dashoffset="0"></circle>
+                  <defs>
+                    <linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="#00aaff"/><stop offset="1" stop-color="#66b8ff"/></linearGradient>
+                  </defs>
+                  <text x="50" y="58" text-anchor="middle" font-size="18" font-weight="800" fill="#0b234d" class="ring-value">0</text>
+                </svg>
+              </div>
+              <div style="flex:1">
+                <div class="label">Потенциал спроса</div>
+                <div class="desc">Маркетинг и НИОКР — до <strong>20</strong> пунктов.  </div>
+              </div>
+            </div>
+
+            <!-- Потенциальное предложение (max 20) -->
+            <div class="rif-factor" data-factor="supply" role="group" aria-label="Потенциальное предложение">
+              <div class="svg-wrap" aria-hidden="true">
+                <svg viewBox="0 0 100 100" role="img" aria-hidden="true">
+                  <circle cx="50" cy="50" r="42" stroke="rgba(0,0,0,0.06)" stroke-width="12" fill="none"></circle>
+                  <circle class="ring" cx="50" cy="50" r="42" stroke-width="12" stroke-linecap="round" stroke="url(#g3)" fill="none" stroke-dasharray="0" stroke-dashoffset="0"></circle>
+                  <defs>
+                    <linearGradient id="g3" x1="0" x2="1"><stop offset="0" stop-color="#45c67a"/><stop offset="1" stop-color="#8fe0a1"/></linearGradient>
+                  </defs>
+                  <text x="50" y="58" text-anchor="middle" font-size="18" font-weight="800" fill="#0b234d" class="ring-value">0</text>
+                </svg>
+              </div>
+              <div style="flex:1">
+                <div class="label">Потенциальное предложение</div>
+                <div class="desc">Доля в общем производстве — до <strong>20</strong> пунктов.</div>
+              </div>
+            </div>
+
+            <!-- Эффективность 80% (max 10) -->
+            <div class="rif-factor" data-factor="efficiency" role="group" aria-label="Эффективность">
+              <div class="svg-wrap" aria-hidden="true">
+                <svg viewBox="0 0 100 100" role="img" aria-hidden="true">
+                  <circle cx="50" cy="50" r="42" stroke="rgba(0,0,0,0.06)" stroke-width="12" fill="none"></circle>
+                  <circle class="ring" cx="50" cy="50" r="42" stroke-width="12" stroke-linecap="round" stroke="url(#g4)" fill="none" stroke-dasharray="0" stroke-dashoffset="0"></circle>
+                  <defs>
+                    <linearGradient id="g4" x1="0" x2="1"><stop offset="0" stop-color="#ffb400"/><stop offset="1" stop-color="#ffd66e"/></linearGradient>
+                  </defs>
+                  <text x="50" y="58" text-anchor="middle" font-size="18" font-weight="800" fill="#0b234d" class="ring-value">0</text>
+                </svg>
+              </div>
+              <div style="flex:1">
+                <div class="label">Эффективность</div>
+                <div class="desc">Оценивает загрузку фабрики; оптимальная загрузка даёт максимум — до <strong>10</strong> пунктов.</div>
+              </div>
+            </div>
+
+            <!-- Доля рынка (max 20) -->
+            <div class="rif-factor" data-factor="market" role="group" aria-label="Доля рынка">
+              <div class="svg-wrap" aria-hidden="true">
+                <svg viewBox="0 0 100 100" role="img" aria-hidden="true">
+                  <circle cx="50" cy="50" r="42" stroke="rgba(0,0,0,0.06)" stroke-width="12" fill="none"></circle>
+                  <circle class="ring" cx="50" cy="50" r="42" stroke-width="12" stroke-linecap="round" stroke="url(#g5)" fill="none" stroke-dasharray="0" stroke-dashoffset="0"></circle>
+                  <defs>
+                    <linearGradient id="g5" x1="0" x2="1"><stop offset="0" stop-color="#ff5b9a"/><stop offset="1" stop-color="#ff87c6"/></linearGradient>
+                  </defs>
+                  <text x="50" y="58" text-anchor="middle" font-size="18" font-weight="800" fill="#0b234d" class="ring-value">0</text>
+                </svg>
+              </div>
+              <div style="flex:1">
+                <div class="label">Доля рынка</div>
+                <div class="desc">Ваша доля продаж в рынке — до <strong>20</strong> пунктов.</div>
+              </div>
+            </div>
+
+            <!-- Рост (max 20) -->
+            <div class="rif-factor" data-factor="growth" role="group" aria-label="Рост">
+              <div class="svg-wrap" aria-hidden="true">
+                <svg viewBox="0 0 100 100" role="img" aria-hidden="true">
+                  <circle cx="50" cy="50" r="42" stroke="rgba(0,0,0,0.06)" stroke-width="12" fill="none"></circle>
+                  <circle class="ring" cx="50" cy="50" r="42" stroke-width="12" stroke-linecap="round" stroke="url(#g6)" fill="none" stroke-dasharray="0" stroke-dashoffset="0"></circle>
+                  <defs>
+                    <linearGradient id="g6" x1="0" x2="1"><stop offset="0" stop-color="#7b61ff"/><stop offset="1" stop-color="#b79bff"/></linearGradient>
+                  </defs>
+                  <text x="50" y="58" text-anchor="middle" font-size="18" font-weight="800" fill="#0b234d" class="ring-value">0</text>
+                </svg>
+              </div>
+              <div style="flex:1">
+                <div class="label">Рост</div>
+                <div class="desc">Темп роста сбыта относительно индустрии — до <strong>20</strong> пунктов.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Аккордеон: Интересный факт (про нулевой период и точные значения) -->
+      <div class="accordion" id="rif-fact" aria-hidden="false" style="margin-top:12px;">
+        <button class="trigger" aria-expanded="false" aria-controls="rif-fact-content">Интересный факт <span aria-hidden="true">▾</span></button>
+        <div class="content" id="rif-fact-content">
+          <p>
+            В нулевом периоде все фирмы стартуют с одинакового базового РИФ, который складывается из шести компонентов. Формально это выглядит так (очки указываются в пунктах, не в процентах): Накопленная прибыль — <strong>50</strong> пунктов, Потенциал спроса — <strong>10</strong>, Потенциальное предложение — <strong>10</strong>, Эффективность — <strong>10</strong>, Доля рынка — <strong>10</strong>, Рост — <strong>10</strong>. Итого: базовый РИФ = <strong>100</strong> пунктов.
+          </p>
+          <p style="margin-top:8px;">
+            Технически: накопленная прибыль как показатель не имеет практического потолка (теоретически может расти очень сильно), однако её вклад в РИФ ограничен рамкой (вклад в расчёт — до 50 пунктов). Остальные факторы — относительные и имеют указанные максимально возможные вклады (в реальной игре значения считаются по формулам и относительны к средним по индустрии).
+          </p>
+          <p style="margin-top:8px;color:#334155;font-style:italic;">Коротко: ноль — это стартовый «100». Всё, что дальше — вопрос стратегии, маркетинга и умения избегать увольнения директора (шутка, не увольняют).</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- PRIZES -->
+    <section id="prizes" class="prizes-section" aria-label="Призовые">
+      <div class="section-title">🏆 Призовые на Чемпионат</div>
+      <div class="prizes-table" role="list" aria-hidden="false">
+        <div class="prize-row highlight" role="listitem">
+          <div class="label">1 место</div>
+          <div class="value"><span class="counter" data-target="1000000">0</span> экси</div>
+        </div>
+
+        <div class="prize-row" role="listitem">
+          <div class="label">2 место</div>
+          <div class="value"><span class="counter" data-target="500000">0</span> экси</div>
+        </div>
+
+        <div class="prize-row" role="listitem">
+          <div class="label">3 место</div>
+          <div class="value"><span class="counter" data-target="250000">0</span> экси</div>
+        </div>
+
+        <div class="prize-row" role="listitem">
+          <div class="label">Финал</div>
+          <div class="value"><span class="counter" data-target="100000">0</span> экси</div>
+        </div>
+
+        <div class="prize-row" role="listitem">
+          <div class="label">Полуфинал</div>
+          <div class="value"><span class="counter" data-target="75000">0</span> экси</div>
+        </div>
+
+        <div class="prize-row" role="listitem">
+          <div class="label">Вторая стадия</div>
+          <div class="value"><span class="counter" data-target="25000">0</span> экси</div>
+        </div>
+
+        <div class="prize-row" role="listitem">
+          <div class="label">Отборочные</div>
+          <div class="value"><span class="counter" data-target="10000">0</span> экси</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOURNAMENT -->
+    <section id="tournament" aria-label="Турнирная сетка">
+      <h2>Турнирная сетка — этапы</h2>
+
+      <div id="mecom-bracket" class="mecom-bracket" data-storage-key="mecom_bracket_state_v4" data-auto-seed="true">
+        <div class="mecom-rounds-nav" id="mecomRoundsNav" role="tablist" aria-label="Раунды"></div>
+
+        <div class="mecom-swiper" id="mecomSwiper" aria-live="polite">
+          <div class="mecom-swiper-track" id="mecomSwiperTrack"></div>
+        </div>
+
+        <div class="mecom-dots" id="mecomDots" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <!-- WHY MEKOM -->
+    <section id="why">
+      <h2>Почему мы — МЕКОМ?</h2>
+      <div class="why" style="margin-top:8px">
+        <div class="badge">Легенда</div>
+        <div class="text">
+          <p class="muted">Когда мы создавали корпорацию, решили сделать лёгкий реверанс в сторону нашего классного руководителя Марины Егоровны — взяли её «МЕ» и просто докрутили название. Оставили знакомое звучание, но слегка поменяли букву, чтобы получилось уникально. Теперь МЕКОМ — это и про нас, и про игру, и про то, что в жизни всегда есть место креативу и хитрости (а так же подхалимству).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- REGISTRATION -->
+    <section id="reg">
+      <h2>Как принять участие</h2>
+      <p class="muted">Соберите команду, зарегистрируйтесь и готовьтесь к раундам. Заполнив форму, вы спустя какое-то время получите подтверждение/отказ в регистрации. В случае подтверждения регистрации команды, название вашей команды отобразиться на сайте в таблице, а именно в разделе отборочные! </p>
+
+      <a
+        class="btn btn-primary submit"
+        href="https://forms.gle/Zo1daNJ5sn5e5AcJ6"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Подать заявку — открыть форму в новой вкладке"
+      >
+        Подать заявку на участие
+      </a>
+    </section>
+
+    <!-- CONTACTS -->
+    <section>
+      <h2>Контакты</h2>
+      <p class="muted">
+        Телеграм-канал: <a href="https://t.me/mekom_info" target="_blank" rel="noopener">@mekom_info</a><br/>
+        Техподдержка: <a href="https://t.me/mekom_chat" target="_blank" rel="noopener">@mekom_chat</a>
+      </p>
+    </section>
+
+    <footer role="contentinfo">
+      <!-- Подпись убрана по требованию -->
+    </footer>
+  </div>
+
+<script>
+  "use strict";
+
+  // ----- smooth scroll to id -----
+  function scrollToId(id){
+    const el = document.getElementById(id);
+    if(!el) return;
+    // offset adjustment: ensure element not hidden behind any sticky elements (none prominent here)
+    el.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+
+  // ----- УНИФИЦИРОВАННАЯ АНИМАЦИЯ ПОЯВЛЕНИЯ СЕКЦИЙ -----
+  (function initFadeIn(){
+    const sections = document.querySelectorAll('section');
+    if(!sections) return;
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){
+          e.target.classList.add('show');
+          io.unobserve(e.target);
+        }
+      });
+    }, {threshold: 0.10, rootMargin: '0px 0px -50px 0px'});
+    sections.forEach(s=>io.observe(s));
+  })();
+
+  // ----- format number helper -----
+  function formatNumber(n){
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g," ");
+  }
+
+  // ----- animateCounter -----
+  if(typeof window.animateCounter !== 'function'){
+    window.animateCounter = function(el, target, duration=1200){
+      const startTime = performance.now();
+      const from = 0;
+      function step(now){
+        const t = Math.min((now - startTime) / duration, 1);
+        const value = Math.floor(from + (target - from) * t);
+        el.textContent = formatNumber(value);
+        if(t < 1) requestAnimationFrame(step);
+        else el.textContent = formatNumber(target);
+      }
+      requestAnimationFrame(step);
+    };
+  }
+
+  // ----- prize counters when visible -----
+  (function initPrizeCounters(){
+    const counters = document.querySelectorAll('.counter');
+    if(!counters || counters.length === 0) return;
+    const cIO = new IntersectionObserver((entries, obs)=>{
+      entries.forEach(en=>{
+        if(en.isIntersecting){
+          const el = en.target;
+          const tgt = parseInt(el.dataset.target, 10) || 0;
+          animateCounter(el, tgt, 1300);
+          obs.unobserve(el);
+        }
+      });
+    }, {threshold: 0.4});
+    counters.forEach(c=> cIO.observe(c));
+  })();
+
+  // ----- Floaters (smart positioning + reduced-motion respect) -----
+  (function initFloaters(){
+    const floaters = Array.from(document.querySelectorAll('.riff'));
+    const floatersContainer = document.querySelector('.floaters');
+    if(!floaters || floaters.length === 0 || !floatersContainer) return;
+
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function positionFloaters(){
+      const w = window.innerWidth || document.documentElement.clientWidth;
+      // Programmatically set safe positions to avoid covering hero text/buttons on larger screens
+      if(w >= 1400){
+        if(floaters[0]) { floaters[0].style.left = '2%'; floaters[0].style.top = '8%'; floaters[0].style.right = ''; }
+        if(floaters[1]) { floaters[1].style.right = '2%'; floaters[1].style.top = '14%'; floaters[1].style.left = ''; }
+        if(floaters[2]) { floaters[2].style.right = '6%'; floaters[2].style.bottom = '6%'; floaters[2].style.left = ''; floaters[2].style.top = ''; }
+      } else if(w >= 960){
+        if(floaters[0]) { floaters[0].style.left = '3%'; floaters[0].style.top = '10%'; floaters[0].style.right = ''; }
+        if(floaters[1]) { floaters[1].style.right = '4%'; floaters[1].style.top = '16%'; floaters[1].style.left = ''; }
+        if(floaters[2]) { floaters[2].style.left = '6%'; floaters[2].style.bottom = '10%'; floaters[2].style.right = ''; floaters[2].style.top = ''; }
+      } else {
+        // small screens: keep compact positions
+        if(floaters[0]) { floaters[0].style.left = '6%'; floaters[0].style.top = '10%'; floaters[0].style.right = ''; }
+        if(floaters[1]) { floaters[1].style.right = '6%'; floaters[1].style.top = '22%'; floaters[1].style.left = ''; }
+        if(floaters[2]) { floaters[2].style.left = '8%'; floaters[2].style.bottom = '10%'; floaters[2].style.right = ''; floaters[2].style.top = ''; }
+      }
+    }
+
+    floaters.forEach((el, i)=>{
+      el.style.pointerEvents = 'none';
+      // staggered animation, respect reduced motion
+      if(!reduce){
+        const dur = 4 + (i % 3);
+        el.style.animation = `riff-float ${dur}s ${i*0.28}s ease-in-out infinite`;
+      } else {
+        el.style.animation = 'none';
+      }
+      el.style.zIndex = '0'; // ensure they are behind the hero content (hero-row z-index:2)
+    });
+
+    // Parallax-like subtle container translation on scroll (keeps individual animations intact)
+    if(!reduce){
+      window.addEventListener('scroll', ()=>{
+        const sc = window.scrollY || window.pageYOffset || 0;
+        const y = sc * 0.02;
+        floatersContainer.style.transform = `translateY(${y}px)`;
+      }, {passive:true});
+    } else {
+      floatersContainer.style.transform = 'none';
+    }
+
+    // Prevent floaters from overlapping other major sections:
+    // When the tournament swiper enters the viewport (user scrolled down),
+    // hide floaters to guarantee they "не накладываются на первый слайд".
+    const tournamentEl = document.getElementById('mecomSwiper');
+    if(tournamentEl){
+      const obs = new IntersectionObserver((entries)=>{
+        entries.forEach(en=>{
+          if(en.isIntersecting){
+            // hide floaters
+            floatersContainer.classList.add('hidden');
+          } else {
+            floatersContainer.classList.remove('hidden');
+          }
+        });
+      }, {root:null, threshold: 0.02});
+      obs.observe(tournamentEl);
+    }
+
+    // reposition on resize
+    window.addEventListener('resize', ()=>{ positionFloaters(); }, {passive:true});
+    // initial positioning
+    positionFloaters();
+  })();
+
+  // ----- Hero title typing (respect reduced motion) -----
+  (function typeTitle(){
+    const el = document.getElementById('hero-title');
+    if(!el) return;
+    const text = el.textContent.trim();
+    el.textContent = '';
+    let idx = 0;
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduce){
+      el.textContent = text;
+      return;
+    }
+    function tick(){
+      if(idx <= text.length){
+        el.textContent = text.slice(0, idx);
+        idx++;
+        setTimeout(tick, 22);
+      } else {
+        el.style.borderRight = 'none';
+      }
+    }
+    tick();
+  })();
+
+  // ----- form stub (kept simple) -----
+  function submitForm(e){
+    if(e && e.preventDefault) e.preventDefault();
+    const team = (document.querySelector('input[name="team"]') || {}).value || '';
+    alert('Заявка принята: ' + (team ? team : 'команда без имени') + '. Организаторы свяжутся в телеграме.');
+  }
+
+  /* =========================================================
+     РИФ: логика анимации и демо-значения - добавлено из кода 1
+     ========================================================= */
+  (function initRif(){
+    const rifSection = document.querySelector('#rif');
+    if(!rifSection) return;
+
+    // Максимальные вклады в РИФ (пункты)
+    const MAX = {
+      profit: 400,
+      demand: 20,
+      supply: 20,
+      efficiency: 10,
+      market: 20,
+      growth: 20
+    };
+
+    // Демонстрация - значения факторов
+    const demo = {
+      profit: 237,
+      demand: 12,
+      supply: 10,
+      efficiency: 8,
+      market: 5,
+      growth: 15
+    };
+
+    // Значение в центральной диаграмме
+    const LAST_GAME_RIF = 164;
+
+    // Helpers and elements
+    const factorEls = document.querySelectorAll('.rif-factor');
+    const barEls = document.querySelectorAll('.rif-bar');
+    const totalEl = document.querySelector('#rifTotal');
+    const totalDonutText = document.querySelector('#totalDonutText');
+    const totalRing = document.querySelector('.total-ring');
+
+    // Build factor map (cur & max)
+    const factors = {
+      profit: { cur: demo.profit, max: MAX.profit },
+      demand: { cur: demo.demand, max: MAX.demand },
+      supply: { cur: demo.supply, max: MAX.supply },
+      efficiency: { cur: demo.efficiency, max: MAX.efficiency },
+      market: { cur: demo.market, max: MAX.market },
+      growth: { cur: demo.growth, max: MAX.growth }
+    };
+
+    // sum points (demo) - сумма всех факторов
+    const totalPoints = Object.keys(factors).reduce((s,k)=> s + factors[k].cur, 0);
+
+    // Prepare rings: compute circumference and set initial dasharray/dashoffset
+    function prepareRings(){
+      factorEls.forEach(el=>{
+        const ring = el.querySelector('.ring');
+        if(!ring) return;
+        const r = parseFloat(ring.getAttribute('r')) || 42;
+        const circumference = 2 * Math.PI * r;
+        ring.style.strokeDasharray = String(circumference);
+        ring.style.strokeDashoffset = String(circumference);
+      });
+    }
+    prepareRings();
+
+    // animate routine
+    function animateRif(){
+      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // rings & inner numbers
+      factorEls.forEach((el, idx)=>{
+        const key = el.dataset.factor;
+        const f = factors[key];
+        if(!f) return;
+        const ring = el.querySelector('.ring');
+        const textNode = el.querySelector('.ring-value');
+        // percentage of factor max (0..100)
+        const pct = (f.max > 0) ? Math.round((f.cur / f.max) * 100) : 100;
+        // compute circumference from current ring stroke-dasharray
+        const dashStr = ring.style.strokeDasharray || ring.getAttribute('stroke-dasharray') || '';
+        const circumference = parseFloat(dashStr) || (2 * Math.PI * 42);
+
+        const offset = circumference * (1 - (pct / 100));
+        if(reduce){
+          ring.style.transition = 'none';
+          ring.style.strokeDashoffset = offset;
+          if(textNode) textNode.textContent = String(f.cur);
+        } else {
+          // animate stroke offset
+          ring.style.transition = 'stroke-dashoffset 1100ms cubic-bezier(.2,.9,.2,1)';
+          // small stagger
+          setTimeout(()=> { ring.style.strokeDashoffset = offset; }, idx * 80);
+          // animate inner number
+          if(textNode){
+            const start = performance.now();
+            const duration = 900;
+            const from = 0;
+            (function tick(now){
+              const t = Math.min((now - start)/duration, 1);
+              const curVal = Math.floor(from + (f.cur - from) * t);
+              textNode.textContent = String(curVal);
+              if(t < 1) requestAnimationFrame(tick);
+              else textNode.textContent = String(f.cur);
+            })(performance.now());
+          }
+        }
+      });
+
+      // bars
+      barEls.forEach((bar, idx)=>{
+        const key = bar.dataset.bar;
+        const f = factors[key];
+        if(!f) return;
+        const fill = bar.querySelector('.bar-fill');
+        const countEl = bar.querySelector('[data-count]');
+        const pct = Math.round((f.cur / f.max) * 100);
+        if(!fill) return;
+        if(reduce){
+          fill.style.width = pct + '%';
+          if(countEl) countEl.textContent = String(f.cur);
+        } else {
+          setTimeout(()=> { fill.style.width = pct + '%'; }, 60 + idx * 80);
+          if(countEl){
+            const start = performance.now();
+            const duration = 900;
+            (function tick(now){
+              const t = Math.min((now - start)/duration, 1);
+              const curVal = Math.floor(0 + (f.cur - 0) * t);
+              countEl.textContent = String(curVal);
+              if(t < 1) requestAnimationFrame(tick);
+              else countEl.textContent = String(f.cur);
+            })(performance.now());
+          }
+        }
+      });
+
+      // total - соотношение LAST_GAME_RIF к сумме всех факторов
+      const totalValue = LAST_GAME_RIF;
+      const totalPercentage = (LAST_GAME_RIF / totalPoints) * 100;
+
+      if(reduce){
+        if(totalEl) totalEl.textContent = String(totalPoints);
+        if(totalDonutText) totalDonutText.textContent = String(totalValue);
+        if(totalRing) totalRing.style.strokeDashoffset = String(100 - totalPercentage);
+      } else {
+        if(totalEl){
+          const start = performance.now();
+          const duration = 1100;
+          (function tick(now){
+            const t = Math.min((now - start)/duration, 1);
+            const curVal = Math.floor(0 + (totalPoints - 0) * t);
+            totalEl.textContent = String(curVal);
+            if(t < 1) requestAnimationFrame(tick);
+            else totalEl.textContent = String(totalPoints);
+          })(performance.now());
+        }
+        if(totalRing){
+          totalRing.style.transition = 'stroke-dashoffset 1100ms cubic-bezier(.2,.9,.2,1)';
+          setTimeout(()=> totalRing.style.strokeDashoffset = String(100 - totalPercentage), 30);
+        }
+        if(totalDonutText){
+          const start = performance.now();
+          const duration = 1100;
+          (function tick(now){
+            const t = Math.min((now - start)/duration, 1);
+            const curVal = Math.floor(0 + (totalValue - 0) * t);
+            totalDonutText.textContent = String(curVal);
+            if(t < 1) requestAnimationFrame(tick);
+            else totalDonutText.textContent = String(totalValue);
+          })(performance.now());
+        }
+      }
+    }
+
+    // trigger animation once when in view
+    const obs = new IntersectionObserver((entries, o)=>{
+      entries.forEach(en=>{
+        if(en.isIntersecting){
+          animateRif();
+          o.unobserve(en.target);
+        }
+      });
+    }, {threshold: 0.18});
+    obs.observe(rifSection);
+
+    factorEls.forEach(fe=>{
+      fe.tabIndex = 0;
+    });
+  })();
+
+  /* =========================================================
+     Аккордеон: Интересный факт — управление открытием/закрытием - добавлено из кода 1
+     ========================================================= */
+  (function initAccordion(){
+    const accordions = document.querySelectorAll('.accordion');
+    if(!accordions.length) return;
+    accordions.forEach(acc=>{
+      const trigger = acc.querySelector('.trigger');
+      const content = acc.querySelector('.content');
+      if(!trigger || !content) return;
+      // Ensure initial collapsed state
+      content.style.maxHeight = '0px';
+      content.style.opacity = '0';
+      trigger.addEventListener('click', ()=>{
+        const open = acc.classList.contains('open');
+        if(open){
+          // close
+          acc.classList.remove('open');
+          trigger.setAttribute('aria-expanded', 'false');
+          // animate collapse: set explicit height to current, then to 0
+          const h = content.scrollHeight;
+          content.style.maxHeight = h + 'px';
+          // allow the browser to paint
+          requestAnimationFrame(()=> {
+            content.style.maxHeight = '0px';
+            content.style.opacity = '0';
+          });
+          // remove padding via JS after animation
+          setTimeout(()=> { content.style.padding = '0 12px'; }, 320);
+        } else {
+          // open
+          acc.classList.add('open');
+          trigger.setAttribute('aria-expanded', 'true');
+          // restore padding first so layout includes it
+          content.style.padding = '12px';
+          const h = content.scrollHeight;
+          content.style.maxHeight = h + 'px';
+          content.style.opacity = '1';
+          // after animation remove maxHeight to allow internal changes (optional)
+          setTimeout(()=> { content.style.maxHeight = 'none'; }, 400);
+        }
+      });
+    });
+  })();
+
+  /* ===========================================================
+     MECOM BRACKET — полностью изолированная реализация турнирной сетки
+     ============================================================ */
+  (function(){
+    const qs = (s, r=document) => r.querySelector(s);
+    const qsa = (s, r=document) => Array.from((r||document).querySelectorAll(s));
+
+    const RENDER_OPTIONS = { keepEmptySlots: false };
+
+    const TOURNAMENT_DATA = [
+      {
+        name: "Отборочные",
+        packs: [
+          {
+            title: "Пачка A — 7 класс",
+            teams: [
+              { name: "-", grade: "7", branch: "Юг" },
+              { name: "-", grade: "7", branch: "Юг" },
+              { name: "-", grade: "7", branch: "Юг" },
+              { name: "-", grade: "7", branch: "Юг" },
+              { name: "-", grade: "7", branch: "Юг" },
+              { name: "-", grade: "7", branch: "Юг" },
+              { name: "-", grade: "7", branch: "Юг" },
+              { name: "-", grade: "7", branch: "Юг" },
+              { name: "-", grade: "7", branch: "Юг" },
+              { name: "-", grade: "7", branch: "Юг" }
+            ],
+            winnerIndex: []
+          },
+          {
+            title: "Пачка B — 8 класс",
+            teams: [
+              { name: "-", grade: "8", branch: "Юг" },
+              { name: "-", grade: "8", branch: "Юг" },
+              { name: "-", grade: "8", branch: "Юг" },
+              { name: "-", grade: "8", branch: "Юг" },
+              { name: "-", grade: "8", branch: "Юг" },
+              { name: "-", grade: "8", branch: "Юг" },
+              { name: "-", grade: "8", branch: "Юг" },
+              { name: "-", grade: "8", branch: "Юг" },
+              { name: "-", grade: "8", branch: "Юг" },
+              { name: "-", grade: "8", branch: "Юг" }
+            ],
+            winnerIndex: []
+          },
+          {
+            title: "Пачка C — 9 класс",
+            teams: [
+              { name: "-", grade: "9", branch: "Юг" },
+              { name: "-", grade: "9", branch: "Юг" },
+              { name: "-", grade: "9", branch: "Юг" },
+              { name: "-", grade: "9", branch: "Юг" },
+              { name: "-", grade: "9", branch: "Юг" },
+              { name: "-", grade: "9", branch: "Юг" },
+              { name: "-", grade: "9", branch: "Юг" },
+              { name: "-", grade: "9", branch: "Юг" },
+              { name: "-", grade: "9", branch: "Юг" },
+              { name: "-", grade: "9", branch: "Юг" }
+            ],
+            winnerIndex: []
+          },
+          {
+            title: "Пачка D — 10 класс",
+            teams: [
+              { name: "-", grade: "10", branch: "Юг" },
+              { name: "-", grade: "10", branch: "Юг" },
+              { name: "-", grade: "10", branch: "Юг" },
+              { name: "-", grade: "10", branch: "Юг" },
+              { name: "-", grade: "10", branch: "Юг" },
+              { name: "-", grade: "10", branch: "Юг" },
+              { name: "-", grade: "10", branch: "Юг" },
+              { name: "-", grade: "10", branch: "Юг" },
+              { name: "-", grade: "10", branch: "Юг" },
+              { name: "-", grade: "10", branch: "Юг" }
+            ],
+            winnerIndex: []
+          },
+
+          {
+            title: "Пачка E — 11 класс",
+            teams: [
+              { name: "-", grade: "11", branch: "Юг" },
+              { name: "-", grade: "11", branch: "Юг" },
+              { name: "-", grade: "11", branch: "Юг" },
+              { name: "-", grade: "11", branch: "Юг" },
+              { name: "-", grade: "11", branch: "Юг" },
+              { name: "-", grade: "11", branch: "Юг" },
+              { name: "-", grade: "11", branch: "Юг" },
+              { name: "-", grade: "11", branch: "Юг" },
+              { name: "-", grade: "11", branch: "Юг" },
+              { name: "-", grade: "11", branch: "Юг" }
+            ],
+            winnerIndex: []
+          }
+        ]
+      },
+      {
+        name: "Вторая стадия",
+        packs: [
+          {
+            title: "Пачка F – 78 регион (MAX)",
+            teams: [
+              { name: "", grade: "7", branch: "Юг" },
+              { name: "",  grade: "7", branch: "Юг" },
+              { name: "", grade: "7", branch: "Юг" },
+              { name: "", grade: "8", branch: "Юг" },
+              { name: "", grade: "8", branch: "Юг" },
+              { name: "", grade: "8", branch: "Юг" }
+
+            ],
+            winnerIndex: [0,2,3]
+          },
+          {
+            title: "Пачка G – 78 регион (MIN)",
+            teams: [
+              { name: "", grade: "7", branch: "Юг" },
+              { name: "", grade: "7", branch: "Юг" },
+              { name: "", grade: "7", branch: "Юг" },
+              { name: "", grade: "8", branch: "Юг" },
+              { name: "", grade: "8", branch: "Юг" },
+              { name: "", grade: "8", branch: "Юг" }
+            ],
+            winnerIndex: [0,1,3]
+          },
+          {
+            title: "Пачка H — 9/10/11 (MAX)",
+            teams: [
+              { name: "", grade: "10", branch: "Юг" },
+              { name: "", grade: "10", branch: "Юг" },
+              { name: "", grade: "10", branch: "Юг" },
+              { name: "", grade: "11", branch: "Юг" },
+              { name: "", grade: "11", branch: "Юг" },
+              { name: "", grade: "11", branch: "Юг" },
+              { name: "", grade: "11", branch: "Юг" },
+              { name: "", grade: "11", branch: "Юг" },
+              { name: "", grade: "11", branch: "Юг" }
+            ],
+            winnerIndex: [1,2,3,4,5]
+          },
+          {
+            title: "Пачка J — 9/10/11 (MIN)",
+            teams: [
+              { name: "", grade: "9", branch: "Юг" },
+              { name: "", grade: "9", branch: "Юг" },
+              { name: "", grade: "9", branch: "Юг" },
+              { name: "", grade: "9", branch: "Юг" },
+              { name: "", grade: "9", branch: "Юг" },
+              { name: "", grade: "9", branch: "Юг" },
+              { name: "", grade: "10", branch: "Юг" },
+              { name: "", grade: "10", branch: "Юг" },
+              { name: "", grade: "10", branch: "Юг" }
+            ],
+            winnerIndex: [1,2,3,4,5]
+          }
+        ]
+      },
+      {
+        name: "Полуфинал",
+        packs: [
+          {
+            title: "Пачка K",
+            teams: [
+              { name: "", grade: "9", branch: "Юг" },
+              { name: "", grade: "9", branch: "Юг" },
+              { name: "", grade: "9", branch: "Юг" },
+              { name: "", grade: "9", branch: "Юг" },
+              { name: "", grade: "9", branch: "Юг" },
+              { name: "", grade: "7", branch: "Юг" },
+              { name: "", grade: "7", branch: "Юг" },
+              { name: "", grade: "7", branch: "Юг" },
+            ],
+            winnerIndex: [0,1,2,3]
+          },
+          {
+            title: "Пачка L",
+            teams: [
+              { name: "", grade: "8", branch: "Юг" },
+              { name: "", grade: "8", branch: "Юг" },
+              { name: "", grade: "8", branch: "Юг" },
+              { name: "", grade: "10", branch: "Юг" },
+              { name: "", grade: "10", branch: "Юг" },
+              { name: "", grade: "10", branch: "Юг" },
+              { name: "", grade: "11", branch: "Юг" },
+              { name: "", grade: "11", branch: "Юг" }
+            ],
+            winnerIndex: [0,1,2,3]
+          }
+        ]
+      },
+      {
+        name: "Финал",
+        winnerchamp: { pack: 0, index: 0 },
+        packs: [
+          {
+            title: "Финальная пачка",
+            teams: [
+              { name: "", grade: "9", branch: "Юг" },
+              { name: "", grade: "9", branch: "Юг" },
+              { name: "", grade: "9", branch: "Юг" },
+              { name: "", grade: "9", branch: "Юг" },
+              { name: "", grade: "8", branch: "Юг" },
+              { name: "", grade: "8", branch: "Юг" },
+              { name: "", grade: "8", branch: "Юг" },
+              { name: "", grade: "10", branch: "Юг" }
+            ]
+          }
+        ]
+      }
+    ];
+
+    function deepCopy(obj){ return JSON.parse(JSON.stringify(obj)); }
+    function prepareRenderData(src){ return deepCopy(src); }
+
+    const ROOT = qs('#mecom-bracket');
+    if(!ROOT){
+      console.warn('[MECOM] #mecom-bracket not found — сетка не инициализирована');
+      return;
+    }
+    const navEl = qs('#mecomRoundsNav', ROOT);
+    const swiper = qs('#mecomSwiper', ROOT);
+    const track = qs('#mecomSwiperTrack', ROOT);
+    const dotsEl = qs('#mecomDots', ROOT);
+
+    const STORAGE_KEY = ROOT.getAttribute('data-storage-key') || 'mecom_bracket_state_vX';
+    const AUTO_SEED = (ROOT.getAttribute('data-auto-seed') || 'true') === 'true';
+
+    let renderData = prepareRenderData(TOURNAMENT_DATA);
+
+    function renderNav(activeIdx=0){
+      navEl.innerHTML = '';
+      renderData.forEach((r, idx)=>{
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'mecom-chip' + (idx === activeIdx ? ' is-active' : '');
+        btn.textContent = r.name || `Раунд ${idx+1}`;
+        btn.addEventListener('click', ()=> goTo(idx));
+        navEl.appendChild(btn);
+      });
+    }
+
+    function renderDots(activeIdx=0){
+      dotsEl.innerHTML = '';
+      renderData.forEach((_, idx)=>{
+        const d = document.createElement('div');
+        d.className = 'mecom-dot' + (idx === activeIdx ? ' is-active' : '');
+        d.addEventListener('click', ()=> goTo(idx));
+        dotsEl.appendChild(d);
+      });
+    }
+
+    function renderSlides(){
+      track.innerHTML = '';
+      renderData.forEach((round, rIndex)=>{
+        const slide = document.createElement('div');
+        slide.className = 'mecom-slide';
+
+        const title = document.createElement('div');
+        title.className = 'mecom-round-title';
+        const left = document.createElement('div'); left.textContent = round.name || `Раунд ${rIndex+1}`;
+        title.appendChild(left);
+        slide.appendChild(title);
+
+        (round.packs || []).forEach((pack, pIndex)=>{
+          const packEl = document.createElement('div');
+          packEl.className = 'pack';
+
+          const packTitle = document.createElement('div');
+          packTitle.className = 'pack-title';
+          packTitle.textContent = pack.title || `Пачка ${pIndex+1}`;
+          packEl.appendChild(packTitle);
+
+          const contents = document.createElement('div'); contents.className = 'pack-contents';
+
+          (pack.teams || []).forEach((team, tIndex)=>{
+            if(!team || !team.name){
+              if(RENDER_OPTIONS.keepEmptySlots){
+                const teamEl = document.createElement('div');
+                teamEl.className = 'mecom-team empty-slot placeholder';
+                const leftBlock = document.createElement('div'); leftBlock.className = 'left';
+                const rightBlock = document.createElement('div'); rightBlock.className = 'name-wrap';
+                const nameDiv = document.createElement('div'); nameDiv.className = 'team-name';
+                nameDiv.textContent = '(пусто)';
+                rightBlock.appendChild(nameDiv);
+                teamEl.appendChild(leftBlock);
+                teamEl.appendChild(rightBlock);
+                contents.appendChild(teamEl);
+              }
+              return;
+            }
+
+            const teamEl = document.createElement('div');
+            teamEl.className = 'mecom-team';
+
+            if(typeof pack.winnerIndex === 'number' && pack.winnerIndex === tIndex) teamEl.classList.add('winner');
+            else if(Array.isArray(pack.winnerIndex) && pack.winnerIndex.includes(tIndex)) teamEl.classList.add('winner');
+
+            const isChampion =
+              (typeof pack.winnerchampIndex === 'number' && pack.winnerchampIndex === tIndex)
+              || (round && round.winnerchamp && round.winnerchamp.pack === pIndex && round.winnerchamp.index === tIndex);
+
+            if(isChampion){
+              teamEl.classList.add('champion');
+              teamEl.classList.remove('winner');
+            }
+
+            const leftBlock = document.createElement('div'); leftBlock.className = 'left';
+            if(!(team && team.noDescription)){
+              const cls = document.createElement('span'); cls.className = 'mecom-tag mecom-tag-grade';
+              cls.textContent = team && team.grade ? `${team.grade} класс` : '';
+              const br = document.createElement('span');
+              let branchClass = '';
+              if(team && team.branch){
+                const b = String(team.branch).toLowerCase();
+                if(b.includes('север')) branchClass = 'mecom-tag-north';
+                else if(b.includes('юг')) branchClass = 'mecom-tag-south';
+                else if(b.includes('вост')) branchClass = 'mecom-tag-east';
+                else if(b.includes('зап')) branchClass = 'mecom-tag-west';
+                else branchClass = 'mecom-tag-north';
+              }
+              br.className = 'mecom-tag ' + branchClass;
+              br.textContent = team && team.branch ? team.branch : '';
+              leftBlock.appendChild(cls);
+              leftBlock.appendChild(br);
+            }
+
+            const rightBlock = document.createElement('div'); rightBlock.className = 'name-wrap';
+            const nameDiv = document.createElement('div'); nameDiv.className = 'team-name';
+            nameDiv.textContent = team && team.name ? team.name : '(пусто)';
+            rightBlock.appendChild(nameDiv);
+
+            if(team && team._promotedFrom && team._showPromoted && !(team.noDescription)){
+              const note = document.createElement('div');
+              note.className = 'promoted-note';
+              note.textContent = `проходит из: ${team._promotedFrom.roundName} · ${team._promotedFrom.packTitle}`;
+              rightBlock.appendChild(note);
+            }
+
+            teamEl.appendChild(leftBlock);
+            teamEl.appendChild(rightBlock);
+            contents.appendChild(teamEl);
+          });
+
+          packEl.appendChild(contents);
+          slide.appendChild(packEl);
+        });
+
+        track.appendChild(slide);
+      });
+
+      // trigger fade-ins (post DOM insert)
+      requestAnimationFrame(()=> {
+        qsa('.mecom-slide', track).forEach(el => el.classList.add('show'));
+        setTimeout(()=> updateHeightForSlide(current), 30);
+      });
+    }
+
+    let current = 0;
+    let startX = 0, startY = 0, curX = 0;
+    let dragging = false;
+    let width = 0;
+    let lastMoveAt = 0;
+
+    function setTranslate(px, withAnim=true){
+      track.style.transition = withAnim ? 'transform .26s ease' : 'none';
+      track.style.transform = `translate3d(${px}px,0,0)`;
+    }
+
+    function updateWidth(){ width = swiper.clientWidth || 1; }
+    window.addEventListener('resize', ()=>{ updateWidth(); setTranslate(-current*width, false); updateHeightForSlide(current); });
+
+    function updateHeightForSlide(i){
+      const slide = track.children[i];
+      if(!slide){
+        swiper.style.height = '120px';
+        return;
+      }
+      const rect = slide.getBoundingClientRect();
+      const h = Math.ceil(rect.height);
+      const minH = 80;
+      swiper.style.height = (Math.max(h, minH)) + 'px';
+    }
+
+    function goTo(i){
+      current = Math.max(0, Math.min(i, renderData.length-1));
+      setTranslate(-current*width, true);
+      setTimeout(()=> updateHeightForSlide(current), 120);
+      const chips = navEl.querySelectorAll('.mecom-chip');
+      chips.forEach((c, idx)=> c.classList.toggle('is-active', idx===current));
+      const dots = dotsEl.querySelectorAll('.mecom-dot');
+      dots.forEach((d, idx)=> d.classList.toggle('is-active', idx===current));
+    }
+
+    function onStart(e){
+      const touch = e.touches ? e.touches[0] : e;
+      startX = touch.clientX;
+      startY = touch.clientY;
+      curX = startX;
+      dragging = true;
+      lastMoveAt = performance.now();
+      track.style.transition = 'none';
+    }
+    function onMove(e){
+      if(!dragging) return;
+      const touch = e.touches ? e.touches[0] : e;
+      const dx = touch.clientX - startX;
+      const dy = touch.clientY - startY;
+      if(Math.abs(dy) > Math.abs(dx)){ dragging = false; setTranslate(-current*width, false); return; }
+      e.preventDefault();
+      curX = touch.clientX;
+      const base = -current * width;
+      setTranslate(base + dx, false);
+      lastMoveAt = performance.now();
+    }
+    function onEnd(){
+      if(!dragging) return;
+      dragging = false;
+      const dx = (curX || startX) - startX;
+      const dt = Math.max(1, performance.now() - lastMoveAt);
+      const velocity = Math.abs(dx)/dt;
+      const threshold = width * 0.18;
+      if(dx < -threshold || (dx < -10 && velocity > 0.6)) goTo(current + 1);
+      else if(dx > threshold || (dx > 10 && velocity > 0.6)) goTo(current - 1);
+      else goTo(current);
+    }
+
+    function attachSwipe(){
+      updateWidth();
+      updateHeightForSlide(current);
+      swiper.addEventListener('touchstart', onStart, {passive:true});
+      swiper.addEventListener('touchmove',  onMove,  {passive:false});
+      swiper.addEventListener('touchend',   onEnd,   {passive:true});
+      swiper.addEventListener('mousedown', (e)=>{ e.preventDefault(); onStart(e); });
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onEnd);
+    }
+
+    function saveState(obj){
+      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(obj)); }catch(e){}
+    }
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return null;
+        return JSON.parse(raw);
+      }catch(e){ return null; }
+    }
+
+    function renderAll(){
+      renderSlides();
+      renderNav(current);
+      renderDots(current);
+      setTranslate(-current*width, false);
+      updateHeightForSlide(current);
+    }
+
+    function init(){
+      const saved = loadState();
+      if(saved && Array.isArray(saved)){
+        renderData = saved;
+      }else if(saved && saved.rounds){
+        renderData = Array.isArray(saved.rounds) ? saved.rounds.map(r=>{
+          return { name: r.name, packs: [ { title: 'Слоты', teams: (r.teams||[]).map(t=>({name:t})) } ] };
+        }) : prepareRenderData(TOURNAMENT_DATA);
+      } else {
+        renderData = prepareRenderData(TOURNAMENT_DATA);
+      }
+
+      renderAll();
+      attachSwipe();
+
+      // Expose debug API
+      window.MECOM_BRACKET_V2 = {
+        getState: ()=> deepCopy(renderData),
+        setState: (obj)=>{ if(Array.isArray(obj)){ renderData = deepCopy(obj); saveState(renderData); renderAll(); } },
+        resetDefaults: ()=> { renderData = prepareRenderData(TOURNAMENT_DATA); saveState(renderData); renderAll(); }
+      };
+    }
+
+    init();
+
+  })(); // end bracket IIFE
+
+</script>
+<!-- Добавь этот код перед закрывающим тегом </body> -->
+
+<style>
+.secret-pixel {
+    position: fixed;
+    width: 1px;
+    height: 1px;
+    background: #000;
+    cursor: pointer;
+    z-index: 10000;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+}
+
+.secret-pixel:hover {
+    transform: scale(8);
+    background: #FF1493;
+    box-shadow: 0 0 20px rgba(255, 20, 147, 0.5);
+}
+
+.pixel-tooltip {
+    position: absolute;
+    font-size: 8px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    white-space: nowrap;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+.secret-pixel:hover .pixel-tooltip {
+    opacity: 1;
+}
+
+@keyframes pixelPop {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(12); opacity: 0.5; }
+    100% { transform: scale(25); opacity: 0; }
+}
+
+.pixel-pop {
+    animation: pixelPop 0.6s forwards;
+}
+
+/* Стили для красивого алерта */
+.secret-mission-alert {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #0b1220, #1a237e);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    z-index: 10001;
+    max-width: 500px;
+    width: 90%;
+    border: 2px solid #FF1493;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+}
+
+.secret-mission-alert h3 {
+    color: #FF1493;
+    margin-bottom: 20px;
+    font-size: 22px;
+}
+
+.secret-mission-alert p {
+    margin: 15px 0;
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+.secret-mission-alert ol {
+    text-align: left;
+    margin: 20px 0;
+    padding-left: 20px;
+}
+
+.secret-mission-alert li {
+    margin: 12px 0;
+    line-height: 1.5;
+}
+
+.secret-mission-alert .highlight {
+    background: rgba(255, 20, 147, 0.2);
+    padding: 10px;
+    border-radius: 8px;
+    border-left: 3px solid #FF1493;
+    margin: 15px 0;
+    font-weight: 600;
+}
+
+.secret-mission-alert .emoji {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 10000;
+}
+</style>
+
+<!-- Добавь этот код перед закрывающим тегом </body> -->
+
+<style>
+.secret-pixel {
+    position: fixed;
+    width: 1px;
+    height: 1px;
+    background: #000;
+    cursor: pointer;
+    z-index: 10000;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+}
+
+.secret-pixel:hover {
+    transform: scale(8);
+    background: #FF1493;
+    box-shadow: 0 0 20px rgba(255, 20, 147, 0.5);
+}
+
+.pixel-tooltip {
+    position: absolute;
+    font-size: 8px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    white-space: nowrap;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+.secret-pixel:hover .pixel-tooltip {
+    opacity: 1;
+}
+
+@keyframes pixelPop {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(12); opacity: 0.5; }
+    100% { transform: scale(25); opacity: 0; }
+}
+
+.pixel-pop {
+    animation: pixelPop 0.6s forwards;
+}
+
+/* Стили для красивого алерта */
+.secret-mission-alert {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(11, 18, 32, 0.95);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+    z-index: 10002;
+    max-width: 500px;
+    width: 90%;
+    border: 2px solid #FF1493;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    backdrop-filter: blur(10px);
+}
+
+.secret-mission-alert h3 {
+    color: #FF1493;
+    margin-bottom: 20px;
+    font-size: 22px;
+}
+
+.secret-mission-alert p {
+    margin: 15px 0;
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+.secret-mission-alert ol {
+    text-align: left;
+    margin: 20px 0;
+    padding-left: 20px;
+}
+
+.secret-mission-alert li {
+    margin: 12px 0;
+    line-height: 1.5;
+}
+
+.secret-mission-alert .highlight {
+    background: rgba(255, 20, 147, 0.2);
+    padding: 10px;
+    border-radius: 8px;
+    border-left: 3px solid #FF1493;
+    margin: 15px 0;
+    font-weight: 600;
+}
+
+.secret-mission-alert .emoji {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #ff1493, #ff69b4, #ff85c2, #ffa7dd);
+    z-index: 10000;
+    overflow: hidden;
+}
+
+/* Фон с размытой надписью МЭКОМ */
+.mekom-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.15;
+    pointer-events: none;
+}
+
+.mekom-text {
+    position: absolute;
+    font-size: 120px;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.3);
+    white-space: nowrap;
+    animation: slideDiagonal 20s linear infinite;
+    transform: rotate(-45deg);
+    font-family: 'Poppins', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 20px;
+}
+
+.mekom-text:nth-child(1) { top: -100px; left: -200px; animation-delay: 0s; }
+.mekom-text:nth-child(2) { top: 150px; left: -200px; animation-delay: -5s; }
+.mekom-text:nth-child(3) { top: 400px; left: -200px; animation-delay: -10s; }
+.mekom-text:nth-child(4) { top: 650px; left: -200px; animation-delay: -15s; }
+
+@keyframes slideDiagonal {
+    0% {
+        transform: translateX(-100px) translateY(-100px) rotate(-45deg);
+    }
+    100% {
+        transform: translateX(calc(100vw + 500px)) translateY(calc(100vh + 500px)) rotate(-45deg);
+    }
+}
+
+/* Стили для кликабельной ссылки */
+.telegram-link {
+    display: inline-block;
+    background: linear-gradient(90deg, #0088cc, #00a2ff);
+    color: white !important;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    margin: 10px 0;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    box-shadow: 0 4px 15px rgba(0, 136, 204, 0.3);
+}
+
+.telegram-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 136, 204, 0.5);
+    border-color: white;
+}
+
+.telegram-link:active {
+    transform: translateY(0);
+}
+
+.telegram-link::after {
+    content: " 🔗";
+    font-size: 14px;
+}
+</style>
+
+<script>
+// Функция для создания секретного пикселя НА ПОЛЯХ
+function createSecretPixel() {
+    // Удаляем старый пиксель, если есть
+    const oldPixel = document.getElementById('secret-pixel');
+    if (oldPixel) oldPixel.remove();
+    
+    const pixel = document.createElement('div');
+    pixel.id = 'secret-pixel';
+    pixel.className = 'secret-pixel';
+    
+    // Определяем зоны полей (вне основного контента)
+    const marginSize = 30; // размер полей в пикселях
+    
+    // Случайно выбираем, на каком поле будет пиксель
+    const fieldPosition = Math.floor(Math.random() * 4); // 0-верх, 1-право, 2-низ, 3-лево
+    
+    let posX, posY;
+    
+    switch(fieldPosition) {
+        case 0: // Верхнее поле
+            posX = Math.floor(Math.random() * window.innerWidth);
+            posY = Math.floor(Math.random() * marginSize);
+            pixel.innerHTML = `<div class="pixel-tooltip" style="bottom: -15px; left: 50%; transform: translateX(-50%);">🎁 Нажми!</div>`;
+            break;
+            
+        case 1: // Правое поле
+            posX = window.innerWidth - Math.floor(Math.random() * marginSize);
+            posY = Math.floor(Math.random() * window.innerHeight);
+            pixel.innerHTML = `<div class="pixel-tooltip" style="top: 50%; left: -40px; transform: translateY(-50%);">🎁 Нажми!</div>`;
+            break;
+            
+        case 2: // Нижнее поле
+            posX = Math.floor(Math.random() * window.innerWidth);
+            posY = window.innerHeight - Math.floor(Math.random() * marginSize);
+            pixel.innerHTML = `<div class="pixel-tooltip" style="top: -15px; left: 50%; transform: translateX(-50%);">🎁 Нажми!</div>`;
+            break;
+            
+        case 3: // Левое поле
+            posX = Math.floor(Math.random() * marginSize);
+            posY = Math.floor(Math.random() * window.innerHeight);
+            pixel.innerHTML = `<div class="pixel-tooltip" style="top: 50%; right: -40px; transform: translateY(-50%);">🎁 Нажми!</div>`;
+            break;
+    }
+    
+    pixel.style.left = posX + 'px';
+    pixel.style.top = posY + 'px';
+    
+    // Обработчик клика
+    pixel.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Создаем оверлей с розовым фоном
+        const overlay = document.createElement('div');
+        overlay.className = 'overlay';
+        
+        // Создаем фон с надписью МЭКОМ
+        const mekomBackground = document.createElement('div');
+        mekomBackground.className = 'mekom-background';
+        
+        // Добавляем несколько строк с текстом МЭКОМ
+        for (let i = 0; i < 4; i++) {
+            const mekomText = document.createElement('div');
+            mekomText.className = 'mekom-text';
+            mekomText.textContent = 'МЭКОМ МЭКОМ МЭКОМ МЭКОМ МЭКОМ';
+            mekomBackground.appendChild(mekomText);
+        }
+        
+        overlay.appendChild(mekomBackground);
+        
+        // Создаем красивое сообщение
+        const alertBox = document.createElement('div');
+        alertBox.className = 'secret-mission-alert';
+        alertBox.innerHTML = `
+            <div class="emoji">🕵️‍♀️</div>
+            <h3>Засекреченная миссия выполнена!</h3>
+            
+            <p>Поздравляем, агент! Вы раскрыли наш хитроумный «сбой в матрице» и нашли тайный купон на <strong>25 000 баллов</strong>!</p>
+            
+            <p><strong>Что делать дальше, чтобы получить награду:</strong></p>
+            
+            <ol>
+                <li>Перейдите по сверхсекретной ссылке:<br>
+                    <a href="https://t.me/mekom_chat" target="_blank" class="telegram-link">https://t.me/mekom_chat</a>
+                </li>
+                <li>Сообщите в чат кодовую фразу:</li>
+            </ol>
+            
+            <div class="highlight">«Я заметил(а) тот самый странный сбой! Мои 25к баллов готовы?»</div>
+            
+            <p>Мы срочно проверим ваши полномочия и зачислим приз. Вы — первый, кто сумел разгадать нашу маленькую хитрость!</p>
+            
+            <button onclick="closeSecretMission()" style="
+                background: linear-gradient(90deg, #FF1493, #FF69B4);
+                color: white;
+                border: none;
+                padding: 12px 30px;
+                border-radius: 25px;
+                font-weight: 600;
+                cursor: pointer;
+                margin-top: 15px;
+                font-family: 'Poppins', sans-serif;
+                transition: all 0.3s ease;
+            ">Понятно! 🎯</button>
+        `;
+        
+        // Добавляем на страницу
+        document.body.appendChild(overlay);
+        document.body.appendChild(alertBox);
+        
+        // Анимация "взрыва" пикселя
+        this.classList.add('pixel-pop');
+        
+        // Пересоздаем пиксель через 5 секунд
+        setTimeout(() => {
+            createSecretPixel();
+        }, 5000);
+    });
+    
+    // Добавляем на страницу
+    document.body.appendChild(pixel);
+}
+
+// Функция для закрытия сообщения
+function closeSecretMission() {
+    const overlay = document.querySelector('.overlay');
+    const alertBox = document.querySelector('.secret-mission-alert');
+    
+    if (overlay) overlay.remove();
+    if (alertBox) alertBox.remove();
+}
+
+// Создаем пиксель при загрузке
+window.addEventListener('load', function() {
+    setTimeout(createSecretPixel, 1000);
+});
+
+// Пересоздаем пиксель при изменении размера окна
+window.addEventListener('resize', function() {
+    setTimeout(createSecretPixel, 500);
+});
+
+// Защита от частых кликов
+let lastClickTime = 0;
+document.addEventListener('click', function(e) {
+    if (e.target.id === 'secret-pixel') {
+        const now = Date.now();
+        if (now - lastClickTime < 5000) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+        lastClickTime = now;
+    }
+});
+
+// Закрытие по клику на оверлей
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('overlay')) {
+        closeSecretMission();
+    }
+});
+</script>
+
+
+</body>
+</html>
+
