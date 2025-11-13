@@ -2424,485 +2424,485 @@
   /* =========================================================
      СЕКРЕТНЫЙ ПИКСЕЛЬ - интегрированная версия
      ========================================================= */
-  // Функция для создания секретного пикселя НА ПОЛЯХ
-  function createSecretPixel() {
-      // Удаляем старый пиксель, если есть
-      const oldPixel = document.getElementById('secret-pixel');
-      if (oldPixel) oldPixel.remove();
-      
-      const pixel = document.createElement('div');
-      pixel.id = 'secret-pixel';
-      pixel.className = 'secret-pixel';
-      // Создаем оверлей с розовым фоном на ВСЮ ПЛОЩАДЬ
-const overlay = document.createElement('div');
-overlay.className = 'overlay';
+// 🔥 СОЗДАЁМ 10 ПИКСЕЛЕЙ С КАПЧАМИ
 
-      // Определяем зоны полей (вне основного контента)
-      const marginSize = 30; // размер полей в пикселях
-      
-      // Случайно выбираем, на каком поле будет пиксель
-      const fieldPosition = Math.floor(Math.random() * 4); // 0-верх, 1-право, 2-низ, 3-лево
-      
-      let posX, posY;
-      
-      switch(fieldPosition) {
-          case 0: // Верхнее поле
-              posX = Math.floor(Math.random() * window.innerWidth);
-              posY = Math.floor(Math.random() * marginSize);
-              pixel.innerHTML = `<div class="pixel-tooltip" style="bottom: -15px; left: 50%; transform: translateX(-50%);">🎁 Нажми!</div>`;
-              break;
-              
-          case 1: // Правое поле
-              posX = window.innerWidth - Math.floor(Math.random() * marginSize);
-              posY = Math.floor(Math.random() * window.innerHeight);
-              pixel.innerHTML = `<div class="pixel-tooltip" style="top: 50%; left: -40px; transform: translateY(-50%);">🎁 Нажми!</div>`;
-              break;
-              
-          case 2: // Нижнее поле
-              posX = Math.floor(Math.random() * window.innerWidth);
-              posY = window.innerHeight - Math.floor(Math.random() * marginSize);
-              pixel.innerHTML = `<div class="pixel-tooltip" style="top: -15px; left: 50%; transform: translateX(-50%);">🎁 Нажми!</div>`;
-              break;
-              
-          case 3: // Левое поле
-              posX = Math.floor(Math.random() * marginSize);
-              posY = Math.floor(Math.random() * window.innerHeight);
-              pixel.innerHTML = `<div class="pixel-tooltip" style="top: 50%; right: -40px; transform: translateY(-50%);">🎁 Нажми!</div>`;
-              break;
-      }
-      
-      pixel.style.left = posX + 'px';
-      pixel.style.top = posY + 'px';
+function createSecretPixels() {
+    // Удаляем старые пиксели
+    document.querySelectorAll('.secret-pixel').forEach(pixel => pixel.remove());
+    
+    // Создаем 10 пикселей
+    for (let i = 0; i < 10; i++) {
+        createSinglePixel(i);
+    }
+}
 
+function createSinglePixel(index) {
+    const pixel = document.createElement('div');
+    pixel.id = `secret-pixel-${index}`;
+    pixel.className = 'secret-pixel';
+    
+    // Случайная позиция на полях
+    const marginSize = 30;
+    const fieldPosition = Math.floor(Math.random() * 4);
+    
+    let posX, posY;
+    
+    switch(fieldPosition) {
+        case 0: // Верхнее поле
+            posX = Math.floor(Math.random() * window.innerWidth);
+            posY = Math.floor(Math.random() * marginSize);
+            pixel.innerHTML = `<div class="pixel-tooltip" style="bottom: -15px; left: 50%; transform: translateX(-50%);">🎁 Нажми! (${index + 1}/10)</div>`;
+            break;
+            
+        case 1: // Правое поле
+            posX = window.innerWidth - Math.floor(Math.random() * marginSize);
+            posY = Math.floor(Math.random() * window.innerHeight);
+            pixel.innerHTML = `<div class="pixel-tooltip" style="top: 50%; left: -40px; transform: translateY(-50%);">🎁 Нажми! (${index + 1}/10)</div>`;
+            break;
+            
+        case 2: // Нижнее поле
+            posX = Math.floor(Math.random() * window.innerWidth);
+            posY = window.innerHeight - Math.floor(Math.random() * marginSize);
+            pixel.innerHTML = `<div class="pixel-tooltip" style="top: -15px; left: 50%; transform: translateX(-50%);">🎁 Нажми! (${index + 1}/10)</div>`;
+            break;
+            
+        case 3: // Левое поле
+            posX = Math.floor(Math.random() * marginSize);
+            posY = Math.floor(Math.random() * window.innerHeight);
+            pixel.innerHTML = `<div class="pixel-tooltip" style="top: 50%; right: -40px; transform: translateY(-50%);">🎁 Нажми! (${index + 1}/10)</div>`;
+            break;
+    }
+    
+    pixel.style.left = posX + 'px';
+    pixel.style.top = posY + 'px';
+    pixel.style.zIndex = 10000 - index; // Разные z-index чтобы не перекрывались
+    
+    // ОБРАБОТЧИК КЛИКА С ШАНСОМ 1 К 10
+    pixel.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // ШАНС 1 К 10 НА ПРЯМОЙ ДОСТУП
+        const isLuckyPixel = Math.random() < 0.1; // 10% шанс
+        
+        if (isLuckyPixel) {
+            // 🎉 ПОВЕЗЛО! Прямой доступ к оверлею
+            this.classList.add('pixel-pop');
+            setTimeout(() => {
+                showSecretMission();
+            }, 300);
+        } else {
+            // 😈 НЕ ПОВЕЗЛО! Адская капча
+            startTortureCaptcha(this);
+        }
+    });
+    
+    document.body.appendChild(pixel);
+}
 
- // 🔥 АДСКАЯ КАПЧА - ОБРАБОТЧИК КЛИКА
-      pixel.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          
-          let captchaLevel = 1;
-          let totalTime = 0;
-          
-          function showTortureCaptcha() {
-              const captchaType = Math.floor(Math.random() * 6);
-              totalTime += 15;
-              
-              switch(captchaType) {
-                  case 0:
-                      showMathCaptcha();
-                      break;
-                  case 1:
-                      showWaitCaptcha();
-                      break;
-                  case 2:
-                      showColorCaptcha();
-                      break;
-                  case 3:
-                      showMemoryCaptcha();
-                      break;
-                  case 4:
-                      showTypingCaptcha();
-                      break;
-                  case 5:
-                      showSliderHell();
-                      break;
-              }
-          }
-          
-          function showMathCaptcha() {
-              const operations = ['+', '-', '*', '/', '%', '**'];
-              const op = operations[Math.floor(Math.random() * operations.length)];
-              let num1 = Math.floor(Math.random() * 1000) + 1;
-              let num2 = Math.floor(Math.random() * 100) + 1;
-              let answer;
-              
-              switch(op) {
-                  case '+': answer = num1 + num2; break;
-                  case '-': answer = num1 - num2; break;
-                  case '*': answer = num1 * num2; break;
-                  case '/': 
-                      answer = (num1 / num2).toFixed(2);
-                      break;
-                  case '%': answer = num1 % num2; break;
-                  case '**': answer = Math.pow(num1, 2); break;
-              }
-              
-              const userAnswer = prompt(`🎯 Уровень ${captchaLevel}/5\nРешите: ${num1} ${op} ${num2} = ?\n(Уже потрачено: ${totalTime} секунд)`);
-              
-              if (parseFloat(userAnswer) === parseFloat(answer)) {
-                  captchaLevel++;
-                  if (captchaLevel <= 5) {
-                      setTimeout(showTortureCaptcha, 1000);
-                  } else {
-                      showSecretMission();
-                  }
-              } else {
-                  alert(`❌ Ошибка! Начинаем заново...\nПравильный ответ: ${answer}`);
-                  captchaLevel = 1;
-                  showTortureCaptcha();
-              }
-          }
-          
-          function showWaitCaptcha() {
-              const waitTime = Math.floor(Math.random() * 30) + 10;
-              const startTime = Date.now();
-              
-              const waitHTML = `
-                  <div class="captcha-overlay">
-                      <div class="captcha-box">
-                          <h3>⏳ Уровень ${captchaLevel}/5 - Ожидание</h3>
-                          <div class="wait-message">
-                              <p>Подождите <span id="wait-time">${waitTime}</span> секунд</p>
-                              <p>Не закрывайте это окно!</p>
-                              <div class="progress-bar">
-                                  <div class="progress-fill" id="progress-fill"></div>
-                              </div>
-                              <p id="time-warning" style="color: red; display: none;">⚠️ СЛИШКОМ РАНЬШЕ! ЖДИТЕ!</p>
-                          </div>
-                          <button id="wait-continue" disabled>Продолжить через ${waitTime}с</button>
-                      </div>
-                  </div>
-              `;
-              
-              document.body.insertAdjacentHTML('beforeend', waitHTML);
-              
-              const continueBtn = document.getElementById('wait-continue');
-              const timeDisplay = document.getElementById('wait-time');
-              const progressFill = document.getElementById('progress-fill');
-              const timeWarning = document.getElementById('time-warning');
-              
-              let timeLeft = waitTime;
-              const interval = setInterval(() => {
-                  timeLeft--;
-                  timeDisplay.textContent = timeLeft;
-                  progressFill.style.width = ((waitTime - timeLeft) / waitTime) * 100 + '%';
-                  
-                  if (timeLeft <= 0) {
-                      clearInterval(interval);
-                      continueBtn.disabled = false;
-                      continueBtn.textContent = 'Продолжить';
-                  }
-              }, 1000);
-              
-              continueBtn.addEventListener('click', function() {
-                  const elapsed = (Date.now() - startTime) / 1000;
-                  if (elapsed < waitTime) {
-                      timeWarning.style.display = 'block';
-                      return;
-                  }
-                  
-                  clearInterval(interval);
-                  document.querySelector('.captcha-overlay').remove();
-                  captchaLevel++;
-                  setTimeout(showTortureCaptcha, 500);
-              });
-          }
-          
-          function showColorCaptcha() {
-              const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD'];
-              const targetColor = colors[Math.floor(Math.random() * colors.length)];
-              
-              const colorHTML = `
-                  <div class="captcha-overlay">
-                      <div class="captcha-box">
-                          <h3>🎨 Уровень ${captchaLevel}/5 - Цвета</h3>
-                          <p>Выберите цвет: <strong style="color: ${targetColor}">${targetColor}</strong></p>
-                          <div class="color-grid">
-                              ${colors.map(color => `
-                                  <div class="color-option" style="background: ${color}" data-color="${color}"></div>
-                              `).join('')}
-                          </div>
-                          <p class="hint">Подсказка: смотрите на HEX код выше</p>
-                      </div>
-                  </div>
-              `;
-              
-              document.body.insertAdjacentHTML('beforeend', colorHTML);
-              
-              document.querySelectorAll('.color-option').forEach(option => {
-                  option.addEventListener('click', function() {
-                      if (this.dataset.color === targetColor) {
-                          document.querySelector('.captcha-overlay').remove();
-                          captchaLevel++;
-                          setTimeout(showTortureCaptcha, 500);
-                      } else {
-                          alert('❌ Неверный цвет! Начинаем заново...');
-                          document.querySelector('.captcha-overlay').remove();
-                          captchaLevel = 1;
-                          showTortureCaptcha();
-                      }
-                  });
-              });
-          }
-          
-          function showMemoryCaptcha() {
-              const symbols = ['♠', '♣', '♥', '♦', '★', '☀', '♫', '☂'];
-              const sequence = [];
-              for (let i = 0; i < 8; i++) {
-                  sequence.push(symbols[Math.floor(Math.random() * symbols.length)]);
-              }
-              
-              alert(`🧠 Уровень ${captchaLevel}/5\nЗапомните последовательность:\n${sequence.join(' ')}\n\nУ вас будет 5 секунд...`);
-              
-              setTimeout(() => {
-                  const userSequence = prompt('Воспроизведите последовательность через пробел:');
-                  if (userSequence === sequence.join(' ')) {
-                      captchaLevel++;
-                      setTimeout(showTortureCaptcha, 500);
-                  } else {
-                      alert(`❌ Неверно! Правильно: ${sequence.join(' ')}`);
-                      captchaLevel = 1;
-                      showTortureCaptcha();
-                  }
-              }, 5000);
-          }
-          
-          function showTypingCaptcha() {
-              const texts = [
-                  "суперкалифрагилистикэкспиалидошиус",
-                  "антидизестаблишментгерианизм",
-                  "трансцендентальнофилософствующий",
-                  "электрокардиографический",
-                  "высокопревосходительствоснование"
-              ];
-              
-              const targetText = texts[Math.floor(Math.random() * texts.length)];
-              const userText = prompt(`⌨️ Уровень ${captchaLevel}/5\nНаберите без ошибок:\n"${targetText}"`);
-              
-              if (userText === targetText) {
-                  captchaLevel++;
-                  setTimeout(showTortureCaptcha, 500);
-              } else {
-                  alert('❌ Опечатка! Начинаем заново...');
-                  captchaLevel = 1;
-                  showTortureCaptcha();
-              }
-          }
-          
-          function showSliderHell() {
-              const targetPosition = Math.floor(Math.random() * 80) + 10;
-              
-              const sliderHTML = `
-                  <div class="captcha-overlay">
-                      <div class="captcha-box">
-                          <h3>🎯 Уровень ${captchaLevel}/5 - Точность</h3>
-                          <p>Установите слайдер на ${targetPosition}%</p>
-                          <div class="slider-container">
-                              <div class="slider-track">
-                                  <div class="slider-thumb" id="slider-thumb"></div>
-                              </div>
-                              <div class="target-line" style="left: ${targetPosition}%"></div>
-                          </div>
-                          <div class="slider-value">Текущее значение: <span id="current-value">0</span>%</div>
-                          <button id="slider-submit">Проверить</button>
-                      </div>
-                  </div>
-              `;
-              
-              document.body.insertAdjacentHTML('beforeend', sliderHTML);
-              
-              const sliderThumb = document.getElementById('slider-thumb');
-              const currentValue = document.getElementById('current-value');
-              let thumbPosition = 0;
-              
-              function updateSlider(value) {
-                  thumbPosition = value;
-                  sliderThumb.style.left = value + '%';
-                  currentValue.textContent = Math.round(value);
-              }
-              
-              sliderThumb.addEventListener('mousedown', function(e) {
-                  e.preventDefault();
-                  document.addEventListener('mousemove', onMouseMove);
-                  document.addEventListener('mouseup', onMouseUp);
-              });
-              
-              function onMouseMove(e) {
-                  const track = document.querySelector('.slider-track');
-                  const trackRect = track.getBoundingClientRect();
-                  let newPosition = ((e.clientX - trackRect.left) / trackRect.width) * 100;
-                  newPosition = Math.max(0, Math.min(100, newPosition));
-                  updateSlider(newPosition);
-              }
-              
-              function onMouseUp() {
-                  document.removeEventListener('mousemove', onMouseMove);
-                  document.removeEventListener('mouseup', onMouseUp);
-              }
-              
-              document.getElementById('slider-submit').addEventListener('click', function() {
-                  if (Math.abs(thumbPosition - targetPosition) < 2) {
-                      document.querySelector('.captcha-overlay').remove();
-                      captchaLevel++;
-                      setTimeout(showTortureCaptcha, 500);
-                  } else {
-                      alert(`❌ Промах! Нужно: ${targetPosition}%, у вас: ${Math.round(thumbPosition)}%`);
-                      document.querySelector('.captcha-overlay').remove();
-                      captchaLevel = 1;
-                      showTortureCaptcha();
-                  }
-              });
-          }
-          
-          // НАЧИНАЕМ АД!
-          showTortureCaptcha();
-      });
-      
-      // Добавляем на страницу
-      document.body.appendChild(pixel);
-  }
-     
-      // Обработчик клика
-      pixel.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          
-          // Создаем оверлей с розовым фоном на ВСЮ ПЛОЩАДЬ
-          const overlay = document.createElement('div');
-          overlay.className = 'overlay';
-          
-          // Создаем фон с надписью МЭКОМ
-          const mekomBackground = document.createElement('div');
-          mekomBackground.className = 'mekom-background';
-          
-          // Добавляем несколько строк с текстом МЭКОМ
-          for (let i = 0; i < 4; i++) {
-              const mekomText = document.createElement('div');
-              mekomText.className = 'mekom-text';
-              mekomText.textContent = 'МЭКОМ МЭКОМ МЭКОМ МЭКОМ МЭКОМ';
-              mekomBackground.appendChild(mekomText);
-          }
-          
-          overlay.appendChild(mekomBackground);
-          
-          // Текст для копирования БЕЗ смайлика в конце
-          const copyText = "«Я заметил(а) тот самый странный сбой! Мои 25к баллов готовы?»";
-          
-          // Создаем красивое сообщение
-          const alertBox = document.createElement('div');
-          alertBox.className = 'secret-mission-alert';
-          alertBox.innerHTML = `
-              <div class="alert-content">
-                  <div>
-                      <div class="emoji">🕵️‍♀️</div>
-                      <h3>Засекреченная миссия выполнена!</h3>
-                      
-                      <p>Поздравляем, агент! Вы раскрыли наш хитроумный «сбой в матрице» и нашли тайный купон на <strong>25 000 баллов</strong>!</p>
-                      
-                      <p><strong>Что делать дальше, чтобы получить награду:</strong></p>
-                      
-                      <ol>
-                          <li>Перейдите по сверхсекретной ссылке:<br>
-                              <a href="https://t.me/mekom_chat" target="_blank" class="telegram-link">https://t.me/mekom_chat</a>
-                          </li>
-                          <li>Сообщите в чат кодовую фразу (нажмите чтобы скопировать):</li>
-                      </ol>
-                      
-                      <div class="copy-text-block" id="copyText">
-                          ${copyText}<span class="copy-indicator">📋</span>
-                      </div>
-                      
-                      <p>Мы срочно проверим ваши полномочия и зачислим приз. Вы — первый, кто сумел разгадать нашу маленькую хитрость!</p>
-                      
-                      <div class="prize-note">
-                          «Данная плюшка будет выдана самому первому пользователю отправившему данное сообщение в чат!»
-                      </div>
-                  </div>
-                  
-                  <button class="close-button">Понятно! 🎯</button>
-              </div>
-          `;
-          
-          // Добавляем на страницу
-          document.body.appendChild(overlay);
-          document.body.appendChild(alertBox);
-          
-          // Функция для копирования текста - ТОЛЬКО СОДЕРЖИМОЕ КАВЫЧЕК
-          const copyElement = document.getElementById('copyText');
-          copyElement.addEventListener('click', function() {
-              // Извлекаем только содержимое кавычек
-              const textInQuotes = copyText.replace(/«(.*)»/, '$1');
-              
-              navigator.clipboard.writeText(textInQuotes).then(() => {
-                  // Показываем подтверждение копирования ПРИВЯЗАННОЕ К КОНЦУ ТЕКСТА
-                  const indicator = this.querySelector('.copy-indicator');
-                  indicator.textContent = ' ✅ Скопировано!';
-                  setTimeout(() => {
-                      indicator.textContent = '📋';
-                  }, 2000);
-              }).catch(err => {
-                  // Fallback для старых браузеров
-                  const textArea = document.createElement('textarea');
-                  textArea.value = textInQuotes;
-                  document.body.appendChild(textArea);
-                  textArea.select();
-                  document.execCommand('copy');
-                  document.body.removeChild(textArea);
-                  
-                  const indicator = this.querySelector('.copy-indicator');
-                  indicator.textContent = ' ✅ Скопировано!';
-                  setTimeout(() => {
-                      indicator.textContent = '📋';
-                  }, 2000);
-              });
-          });
-          
-          // Обработчик закрытия
-          const closeButton = alertBox.querySelector('.close-button');
-          closeButton.addEventListener('click', closeSecretMission);
-          
-          // Анимация "взрыва" пикселя
-          this.classList.add('pixel-pop');
-          
-          // Пересоздаем пиксель через 5 секунд
-          setTimeout(() => {
-              createSecretPixel();
-          }, 5000);
-      });
-      
-      // Добавляем на страницу
-      document.body.appendChild(pixel);
-  }
+// 🔥 ЗАПУСК АДСКОЙ КАПЧИ
+function startTortureCaptcha(pixelElement) {
+    let captchaLevel = 1;
+    let totalTime = 0;
+    
+    function showTortureCaptcha() {
+        const captchaType = Math.floor(Math.random() * 6);
+        totalTime += 15;
+        
+        switch(captchaType) {
+            case 0:
+                showMathCaptcha();
+                break;
+            case 1:
+                showWaitCaptcha();
+                break;
+            case 2:
+                showColorCaptcha();
+                break;
+            case 3:
+                showMemoryCaptcha();
+                break;
+            case 4:
+                showTypingCaptcha();
+                break;
+            case 5:
+                showSliderHell();
+                break;
+        }
+    }
+    
+    function showMathCaptcha() {
+        const operations = ['+', '-', '*', '/', '%', '**'];
+        const op = operations[Math.floor(Math.random() * operations.length)];
+        let num1 = Math.floor(Math.random() * 1000) + 1;
+        let num2 = Math.floor(Math.random() * 100) + 1;
+        let answer;
+        
+        switch(op) {
+            case '+': answer = num1 + num2; break;
+            case '-': answer = num1 - num2; break;
+            case '*': answer = num1 * num2; break;
+            case '/': 
+                answer = (num1 / num2).toFixed(2);
+                break;
+            case '%': answer = num1 % num2; break;
+            case '**': answer = Math.pow(num1, 2); break;
+        }
+        
+        const userAnswer = prompt(`🎯 Уровень ${captchaLevel}/5\nРешите: ${num1} ${op} ${num2} = ?\n(Уже потрачено: ${totalTime} секунд)`);
+        
+        if (parseFloat(userAnswer) === parseFloat(answer)) {
+            captchaLevel++;
+            if (captchaLevel <= 5) {
+                setTimeout(showTortureCaptcha, 1000);
+            } else {
+                pixelElement.classList.add('pixel-pop');
+                setTimeout(() => {
+                    showSecretMission();
+                }, 300);
+            }
+        } else {
+            alert(`❌ Ошибка! Начинаем заново...\nПравильный ответ: ${answer}`);
+            captchaLevel = 1;
+            showTortureCaptcha();
+        }
+    }
+    
+    function showWaitCaptcha() {
+        const waitTime = Math.floor(Math.random() * 30) + 10;
+        const startTime = Date.now();
+        
+        const waitHTML = `
+            <div class="captcha-overlay">
+                <div class="captcha-box">
+                    <h3>⏳ Уровень ${captchaLevel}/5 - Ожидание</h3>
+                    <div class="wait-message">
+                        <p>Подождите <span id="wait-time">${waitTime}</span> секунд</p>
+                        <p>Не закрывайте это окно!</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                        <p id="time-warning" style="color: red; display: none;">⚠️ СЛИШКОМ РАНЬШЕ! ЖДИТЕ!</p>
+                    </div>
+                    <button id="wait-continue" disabled>Продолжить через ${waitTime}с</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', waitHTML);
+        
+        const continueBtn = document.getElementById('wait-continue');
+        const timeDisplay = document.getElementById('wait-time');
+        const progressFill = document.getElementById('progress-fill');
+        const timeWarning = document.getElementById('time-warning');
+        
+        let timeLeft = waitTime;
+        const interval = setInterval(() => {
+            timeLeft--;
+            timeDisplay.textContent = timeLeft;
+            progressFill.style.width = ((waitTime - timeLeft) / waitTime) * 100 + '%';
+            
+            if (timeLeft <= 0) {
+                clearInterval(interval);
+                continueBtn.disabled = false;
+                continueBtn.textContent = 'Продолжить';
+            }
+        }, 1000);
+        
+        continueBtn.addEventListener('click', function() {
+            const elapsed = (Date.now() - startTime) / 1000;
+            if (elapsed < waitTime) {
+                timeWarning.style.display = 'block';
+                return;
+            }
+            
+            clearInterval(interval);
+            document.querySelector('.captcha-overlay').remove();
+            captchaLevel++;
+            setTimeout(showTortureCaptcha, 500);
+        });
+    }
+    
+    function showColorCaptcha() {
+        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD'];
+        const targetColor = colors[Math.floor(Math.random() * colors.length)];
+        
+        const colorHTML = `
+            <div class="captcha-overlay">
+                <div class="captcha-box">
+                    <h3>🎨 Уровень ${captchaLevel}/5 - Цвета</h3>
+                    <p>Выберите цвет: <strong style="color: ${targetColor}">${targetColor}</strong></p>
+                    <div class="color-grid">
+                        ${colors.map(color => `
+                            <div class="color-option" style="background: ${color}" data-color="${color}"></div>
+                        `).join('')}
+                    </div>
+                    <p class="hint">Подсказка: смотрите на HEX код выше</p>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', colorHTML);
+        
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', function() {
+                if (this.dataset.color === targetColor) {
+                    document.querySelector('.captcha-overlay').remove();
+                    captchaLevel++;
+                    setTimeout(showTortureCaptcha, 500);
+                } else {
+                    alert('❌ Неверный цвет! Начинаем заново...');
+                    document.querySelector('.captcha-overlay').remove();
+                    captchaLevel = 1;
+                    showTortureCaptcha();
+                }
+            });
+        });
+    }
+    
+    function showMemoryCaptcha() {
+        const symbols = ['♠', '♣', '♥', '♦', '★', '☀', '♫', '☂'];
+        const sequence = [];
+        for (let i = 0; i < 8; i++) {
+            sequence.push(symbols[Math.floor(Math.random() * symbols.length)]);
+        }
+        
+        alert(`🧠 Уровень ${captchaLevel}/5\nЗапомните последовательность:\n${sequence.join(' ')}\n\nУ вас будет 5 секунд...`);
+        
+        setTimeout(() => {
+            const userSequence = prompt('Воспроизведите последовательность через пробел:');
+            if (userSequence === sequence.join(' ')) {
+                captchaLevel++;
+                setTimeout(showTortureCaptcha, 500);
+            } else {
+                alert(`❌ Неверно! Правильно: ${sequence.join(' ')}`);
+                captchaLevel = 1;
+                showTortureCaptcha();
+            }
+        }, 5000);
+    }
+    
+    function showTypingCaptcha() {
+        const texts = [
+            "суперкалифрагилистикэкспиалидошиус",
+            "антидизестаблишментгерианизм",
+            "трансцендентальнофилософствующий",
+            "электрокардиографический",
+            "высокопревосходительствоснование"
+        ];
+        
+        const targetText = texts[Math.floor(Math.random() * texts.length)];
+        const userText = prompt(`⌨️ Уровень ${captchaLevel}/5\nНаберите без ошибок:\n"${targetText}"`);
+        
+        if (userText === targetText) {
+            captchaLevel++;
+            setTimeout(showTortureCaptcha, 500);
+        } else {
+            alert('❌ Опечатка! Начинаем заново...');
+            captchaLevel = 1;
+            showTortureCaptcha();
+        }
+    }
+    
+    function showSliderHell() {
+        const targetPosition = Math.floor(Math.random() * 80) + 10;
+        
+        const sliderHTML = `
+            <div class="captcha-overlay">
+                <div class="captcha-box">
+                    <h3>🎯 Уровень ${captchaLevel}/5 - Точность</h3>
+                    <p>Установите слайдер на ${targetPosition}%</p>
+                    <div class="slider-container">
+                        <div class="slider-track">
+                            <div class="slider-thumb" id="slider-thumb"></div>
+                        </div>
+                        <div class="target-line" style="left: ${targetPosition}%"></div>
+                    </div>
+                    <div class="slider-value">Текущее значение: <span id="current-value">0</span>%</div>
+                    <button id="slider-submit">Проверить</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', sliderHTML);
+        
+        const sliderThumb = document.getElementById('slider-thumb');
+        const currentValue = document.getElementById('current-value');
+        let thumbPosition = 0;
+        
+        function updateSlider(value) {
+            thumbPosition = value;
+            sliderThumb.style.left = value + '%';
+            currentValue.textContent = Math.round(value);
+        }
+        
+        sliderThumb.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        });
+        
+        function onMouseMove(e) {
+            const track = document.querySelector('.slider-track');
+            const trackRect = track.getBoundingClientRect();
+            let newPosition = ((e.clientX - trackRect.left) / trackRect.width) * 100;
+            newPosition = Math.max(0, Math.min(100, newPosition));
+            updateSlider(newPosition);
+        }
+        
+        function onMouseUp() {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        }
+        
+        document.getElementById('slider-submit').addEventListener('click', function() {
+            if (Math.abs(thumbPosition - targetPosition) < 2) {
+                document.querySelector('.captcha-overlay').remove();
+                captchaLevel++;
+                setTimeout(showTortureCaptcha, 500);
+            } else {
+                alert(`❌ Промах! Нужно: ${targetPosition}%, у вас: ${Math.round(thumbPosition)}%`);
+                document.querySelector('.captcha-overlay').remove();
+                captchaLevel = 1;
+                showTortureCaptcha();
+            }
+        });
+    }
+    
+    // НАЧИНАЕМ АД!
+    showTortureCaptcha();
+}
 
-  // Функция для закрытия сообщения
-  function closeSecretMission() {
-      const overlay = document.querySelector('.overlay');
-      const alertBox = document.querySelector('.secret-mission-alert');
-      
-      if (overlay) overlay.remove();
-      if (alertBox) alertBox.remove();
-  }
+// 🔥 ФУНКЦИЯ ДЛЯ ПОКАЗА СЕКРЕТНОЙ МИССИИ
+function showSecretMission() {
+    // Создаем оверлей с розовым фоном на ВСЮ ПЛОЩАДЬ
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay';
+    
+    // Создаем фон с надписью МЭКОМ
+    const mekomBackground = document.createElement('div');
+    mekomBackground.className = 'mekom-background';
+    
+    // Добавляем несколько строк с текстом МЭКОМ
+    for (let i = 0; i < 4; i++) {
+        const mekomText = document.createElement('div');
+        mekomText.className = 'mekom-text';
+        mekomText.textContent = 'МЭКОМ МЭКОМ МЭКОМ МЭКОМ МЭКОМ';
+        mekomBackground.appendChild(mekomText);
+    }
+    
+    overlay.appendChild(mekomBackground);
+    
+    // Текст для копирования
+    const copyText = "«Я заметил(а) тот самый странный сбой! Мои 25к баллов готовы?»";
+    
+    // Создаем красивое сообщение
+    const alertBox = document.createElement('div');
+    alertBox.className = 'secret-mission-alert';
+    alertBox.innerHTML = `
+        <div class="alert-content">
+            <div>
+                <div class="emoji">🕵️‍♀️</div>
+                <h3>Засекреченная миссия выполнена!</h3>
+                
+                <p>Поздравляем, агент! Вы раскрыли наш хитроумный «сбой в матрице» и нашли тайный купон на <strong>25 000 баллов</strong>!</p>
+                
+                <p><strong>Что делать дальше, чтобы получить награду:</strong></p>
+                
+                <ol>
+                    <li>Перейдите по сверхсекретной ссылке:<br>
+                        <a href="https://t.me/mekom_chat" target="_blank" class="telegram-link">https://t.me/mekom_chat</a>
+                    </li>
+                    <li>Сообщите в чат кодовую фразу (нажмите чтобы скопировать):</li>
+                </ol>
+                
+                <div class="copy-text-block" id="copyText">
+                    ${copyText}<span class="copy-indicator">📋</span>
+                </div>
+                
+                <p>Мы срочно проверим ваши полномочия и зачислим приз. Вы — первый, кто сумел разгадать нашу маленькую хитрость!</p>
+                
+                <div class="prize-note">
+                    «Данная плюшка будет выдана самому первому пользователю отправившему данное сообщение в чат!»
+                </div>
+            </div>
+            
+            <button class="close-button">Понятно! 🎯</button>
+        </div>
+    `;
+    
+    // Добавляем на страницу
+    document.body.appendChild(overlay);
+    document.body.appendChild(alertBox);
+    
+    // Функция для копирования текста
+    const copyElement = document.getElementById('copyText');
+    copyElement.addEventListener('click', function() {
+        const textInQuotes = copyText.replace(/«(.*)»/, '$1');
+        
+        navigator.clipboard.writeText(textInQuotes).then(() => {
+            const indicator = this.querySelector('.copy-indicator');
+            indicator.textContent = ' ✅ Скопировано!';
+            setTimeout(() => {
+                indicator.textContent = '📋';
+            }, 2000);
+        }).catch(err => {
+            const textArea = document.createElement('textarea');
+            textArea.value = textInQuotes;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            const indicator = this.querySelector('.copy-indicator');
+            indicator.textContent = ' ✅ Скопировано!';
+            setTimeout(() => {
+                indicator.textContent = '📋';
+            }, 2000);
+        });
+    });
+    
+    // Обработчик закрытия
+    const closeButton = alertBox.querySelector('.close-button');
+    closeButton.addEventListener('click', function() {
+        overlay.remove();
+        alertBox.remove();
+    });
+}
 
-  // Создаем пиксель при загрузке
-  window.addEventListener('load', function() {
-      setTimeout(createSecretPixel, 1000);
-  });
+// ИНИЦИАЛИЗАЦИЯ
+window.addEventListener('load', function() {
+    setTimeout(createSecretPixels, 1000);
+});
 
-  // Пересоздаем пиксель при изменении размера окна
-  window.addEventListener('resize', function() {
-      setTimeout(createSecretPixel, 500);
-  });
+window.addEventListener('resize', function() {
+    setTimeout(createSecretPixels, 500);
+});
 
-  // Защита от частых кликов
-  let lastClickTime = 0;
-  document.addEventListener('click', function(e) {
-      if (e.target.id === 'secret-pixel') {
-          const now = Date.now();
-          if (now - lastClickTime < 5000) {
-              e.preventDefault();
-              e.stopPropagation();
-              return;
-          }
-          lastClickTime = now;
-      }
-  });
+// Защита от частых кликов
+let lastClickTime = 0;
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('secret-pixel')) {
+        const now = Date.now();
+        if (now - lastClickTime < 5000) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+        lastClickTime = now;
+    }
+});
 
-  // Закрытие по клику на оверлей
-  document.addEventListener('click', function(e) {
-      if (e.target.classList.contains('overlay')) {
-          closeSecretMission();
-      }
-  });
+// Закрытие по клику на оверлей
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('overlay')) {
+        const overlay = document.querySelector('.overlay');
+        const alertBox = document.querySelector('.secret-mission-alert');
+        if (overlay) overlay.remove();
+        if (alertBox) alertBox.remove();
+    }
+});
+
 
 </script>
 
